@@ -30,8 +30,8 @@ def main():
     # Start consumer and monitor alert stream
     streamWatcher = alertConsumer.AlertConsumer(args.topic, **conf)
 
-    try:
-        while True:
+    while True:
+        try:
             msg = streamWatcher.poll(decode=False, verbose=False)
 
             if msg is None:
@@ -39,9 +39,9 @@ def main():
             else:
                 print(msg)
 
-    except KeyboardInterrupt:
-        sys.stderr.write('%% Aborted by user\n')
-        sys.exit()
+        except KeyboardInterrupt:
+            sys.stderr.write('%% Aborted by user\n')
+            sys.exit()
 
 
 if __name__ == "__main__":

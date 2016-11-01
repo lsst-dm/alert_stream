@@ -36,8 +36,8 @@ def main():
     # Start consumer and print alert stream
     streamReader = alertConsumer.AlertConsumer(args.topic, schema_files, **conf)
 
-    try:
-        while True:
+    while True:
+        try:
             msg = streamReader.poll(decode=True)
 
             if msg is None:
@@ -45,9 +45,11 @@ def main():
             else:
                 print(msg)
 
-    except KeyboardInterrupt:
-        sys.stderr.write('%% Aborted by user\n')
-        sys.exit()
+        except IndexError:
+            sys.stderr.write('%% Data cannot be decoded\n')
+        except KeyboardInterrupt:
+            sys.stderr.write('%% Aborted by user\n')
+            sys.exit()
 
 
 if __name__ == "__main__":

@@ -64,17 +64,14 @@ class AlertConsumer(object):
                     return msg.value()
 
         else:
-            try:
-                msg = self.consumer.poll()
+            msg = self.consumer.poll()
 
-                if msg.error():
-                    return _writeEopNotice(msg)
-                else:
-                    if verbose is True:
-                        return self.decodeMessage(msg)
+            if msg.error():
+                return _writeEopNotice(msg)
+            else:
+                if verbose is True:
+                    return self.decodeMessage(msg)
 
-            except IndexError:
-                sys.stderr.write('%% Data cannot be decoded.\n')
         return
 
     def decodeMessage(self, msg):
