@@ -1,7 +1,7 @@
 # Version: 0.0.1
 FROM python:3.5
 MAINTAINER Maria Patterson "maria.t.patterson@gmail.com"
-ENV REFRESHED_AT 2016-10-27
+ENV REFRESHED_AT 2016-10-31
 
 # Install library for confluent-kafka python.
 WORKDIR /home

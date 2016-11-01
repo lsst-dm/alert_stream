@@ -36,10 +36,10 @@ $ docker run -it alert_stream python bin/sendAlertStream.py -h
 
 **Start producing an alert stream**
 
-Start an alert stream to topic “my-stream” for CCD number 35 with 1000 alerts:
+Start an alert stream to topic “my-stream” with 1000 alerts:
 
 ```
-$ docker run -it --network=host alert_stream python bin/sendAlertStream.py my-stream 35 1000
+$ docker run -it --network=host alert_stream python bin/sendAlertStream.py my-stream 1000
 ```
 
 **Consume alert stream**
