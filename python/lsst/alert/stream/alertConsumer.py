@@ -25,32 +25,6 @@ def _writeEopNotice(msg):
     return
 
 
-def _decodeMessage(msg, schema):
-    """Decode Avro message according to a schema.
-
-    Parameters
-    ----------
-    msg : Kafka message
-        The Kafka message result from consumer.poll().
-    schema : Avro schema
-        The reader Avro schema for decoding message.
-
-    Returns
-    -------
-    `dict`
-        Decoded message.
-    """
-    message = msg.value()
-    bytes_io = io.BytesIO(message)
-    try:
-        decoded_msg = avroUtils.readAvroData(bytes_io, schema)
-    except AssertionError:
-        # FIXME this exception is being raised but not sure if it matters yet
-        decoded_msg = None
-        pass
-    return decoded_msg
-
-
 class AlertConsumer(object):
     """Creates an alert stream Kafka consumer for a given topic.
 
@@ -88,8 +62,6 @@ class AlertConsumer(object):
             else:
                 if verbose is True:
                     return msg.value()
-                else:
-                    pass
 
         else:
             try:
@@ -99,10 +71,30 @@ class AlertConsumer(object):
                     return _writeEopNotice(msg)
                 else:
                     if verbose is True:
-                        return _decodeMessage(msg, self.alert_schema)
-                    else:
-                        pass
+                        return self.decodeMessage(msg)
 
             except IndexError:
                 sys.stderr.write('%% Data cannot be decoded.\n')
-                pass
+        return
+
+    def decodeMessage(self, msg):
+        """Decode Avro message according to a schema.
+
+        Parameters
+        ----------
+        msg : Kafka message
+            The Kafka message result from consumer.poll().
+
+        Returns
+        -------
+        `dict`
+            Decoded message.
+        """
+        message = msg.value()
+        bytes_io = io.BytesIO(message)
+        try:
+            decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
+        except AssertionError:
+            # FIXME this exception is being raised but not sure if it matters yet
+            decoded_msg = None
+        return decoded_msg
