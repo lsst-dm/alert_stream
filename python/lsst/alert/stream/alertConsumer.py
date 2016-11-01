@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 import confluent_kafka
+from . import avroUtils
 from . import kafkaUtils
 
 
@@ -14,65 +15,51 @@ class AlertConsumer(object):
     ----------
     topic : `str`
         Name of the topic to subscribe to.
+    schema_files : Avro schema files
+        The reader Avro schema files for decoding data. Optional.
     **kwargs
         Keyword arguments for configuring confluent_kafka.Consumer().
     """
 
-    def __init__(self, topic, **kwargs):
+    def __init__(self, topic, schema_files=None, **kwargs):
         self.consumer = confluent_kafka.Consumer(**kwargs)
         self.consumer.subscribe([topic])
+        if schema_files is not None:
+            self.alert_schema = avroUtils.combineSchemas(schema_files)
 
-    def printAlertStream(self, schema):
-        """Polls Kafka broker and decodes messages according to a given schema for printing.
+    def poll(self, decode=False, verbose=True):
+        """Polls Kafka broker to consume topic.
 
         Parameters
         ----------
-        schema : Avro schema
-            The reader Avro schema for decoding data.
+        decode : `boolean`
+            If True, decodes data from Avro format.
+        verbose: `boolean`
+            If True, returns every message. If False, returns only end of partition messages.
         """
-        try:
-            while True:
+        if decode is False:
+            msg = self.consumer.poll()
+
+            if msg.error():
+                return kafkaUtils.writeEopNotice(msg)
+            else:
+                if verbose is True:
+                    return msg.value()
+                else:
+                    pass
+
+        else:
+            try:
                 msg = self.consumer.poll()
 
-                if msg is None:
-                    continue
+                if msg.error():
+                    return kafkaUtils.writeEopNotice(msg)
                 else:
-                    kafkaUtils.printAllMessages(msg, schema)
+                    if verbose is True:
+                        return kafkaUtils.decodeMessage(msg, self.alert_schema)
+                    else:
+                        pass
 
-        except KeyboardInterrupt:
-            sys.stderr.write('%% Aborted by user\n')
-            sys.exit
-
-    def watchAllAlerts(self):
-        """Polls Kafka broker, monitors for messages, and writes receipt notes.
-        """
-        try:
-            while True:
-                msg = self.consumer.poll()
-
-                if msg is None:
-                    continue
-                else:
-                    kafkaUtils.writeAllReceipts(msg)
-
-        except KeyboardInterrupt:
-            sys.stderr.write('%% Aborted by user\n')
-            sys.exit
-
-    def watchBatches(self):
-        """Polls Kafka broker, monitors for batches, and writes receipt notes.
-        """
-        try:
-            while True:
-                msg = self.consumer.poll()
-
-                if msg is None:
-                    continue
-                elif msg.error():
-                    kafkaUtils.writeEopNotice(msg)
-                else:
-                    continue
-
-        except KeyboardInterrupt:
-            sys.stderr.write('%% Aborted by user\n')
-            sys.exit
+            except IndexError:
+                sys.stderr.write('%% Data cannot be decoded.\n')
+                pass

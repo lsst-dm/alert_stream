@@ -49,6 +49,7 @@ def decodeMessage(msg, schema):
         decoded_msg = avroUtils.readAvroData(bytes_io, schema)
     except AssertionError:
         # FIXME this exception is being raised but not sure if it matters yet
+        decoded_msg = None
         pass
     return decoded_msg
 
