@@ -1,11 +1,54 @@
 from __future__ import print_function
+import io
 import sys
+import time
 import confluent_kafka
 from . import avroUtils
-from . import kafkaUtils
 
 
 __all__ = ['AlertConsumer']
+
+
+def _writeEopNotice(msg):
+    """Send end of partition notice to stderr when no messages left to consume.
+
+    Parameters
+    ----------
+    msg : Kafka message
+        The Kafka message result from consumer.poll().
+    """
+    if msg.error().code() == confluent_kafka.KafkaError._PARTITION_EOF:
+        sys.stderr.write('topic:%s, partition:%d, status:end, offset:%d, key:%s, time:%.3f\n' %
+                         (msg.topic(), msg.partition(), msg.offset(), str(msg.key()),  time.time()))
+    elif msg.error():
+        raise confluent_kafka.KafkaException(msg.error())
+    return
+
+
+def _decodeMessage(msg, schema):
+    """Decode Avro message according to a schema.
+
+    Parameters
+    ----------
+    msg : Kafka message
+        The Kafka message result from consumer.poll().
+    schema : Avro schema
+        The reader Avro schema for decoding message.
+
+    Returns
+    -------
+    `dict`
+        Decoded message.
+    """
+    message = msg.value()
+    bytes_io = io.BytesIO(message)
+    try:
+        decoded_msg = avroUtils.readAvroData(bytes_io, schema)
+    except AssertionError:
+        # FIXME this exception is being raised but not sure if it matters yet
+        decoded_msg = None
+        pass
+    return decoded_msg
 
 
 class AlertConsumer(object):
@@ -41,7 +84,7 @@ class AlertConsumer(object):
             msg = self.consumer.poll()
 
             if msg.error():
-                return kafkaUtils.writeEopNotice(msg)
+                return _writeEopNotice(msg)
             else:
                 if verbose is True:
                     return msg.value()
@@ -53,10 +96,10 @@ class AlertConsumer(object):
                 msg = self.consumer.poll()
 
                 if msg.error():
-                    return kafkaUtils.writeEopNotice(msg)
+                    return _writeEopNotice(msg)
                 else:
                     if verbose is True:
-                        return kafkaUtils.decodeMessage(msg, self.alert_schema)
+                        return _decodeMessage(msg, self.alert_schema)
                     else:
                         pass
 
