@@ -1,0 +1,16 @@
+version: '2'
+services:
+  kafka:
+    image: confluent/kafka
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=localhost
+    ports:
+      - "9092:9092"
+    links:
+      - zookeeper
+    depends_on:
+      - zookeeper
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+        - "2181:2181"
