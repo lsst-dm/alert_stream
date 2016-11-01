@@ -45,6 +45,9 @@ def main():
             else:
                 print(msg)
 
+        except alertConsumer.EopError as e:
+            # Write when reaching end of partition
+            sys.stderr.write(e.message)
         except IndexError:
             sys.stderr.write('%% Data cannot be decoded\n')
         except KeyboardInterrupt:

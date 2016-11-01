@@ -39,6 +39,9 @@ def main():
             else:
                 print(msg)
 
+        except alertConsumer.EopError as e:
+            # Write when reaching end of partition
+            sys.stderr.write(e.message)
         except KeyboardInterrupt:
             sys.stderr.write('%% Aborted by user\n')
             sys.exit()

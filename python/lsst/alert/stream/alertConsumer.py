@@ -1,28 +1,37 @@
 from __future__ import print_function
 import io
-import sys
 import time
 import confluent_kafka
 from . import avroUtils
 
 
-__all__ = ['AlertConsumer']
+__all__ = ['EopError', 'AlertConsumer']
 
 
-def _writeEopNotice(msg):
-    """Send end of partition notice to stderr when no messages left to consume.
+class AlertError(Exception):
+    """Base class for exceptions in this module.
+    """
+    pass
+
+
+class EopError(AlertError):
+    """Exception raised when reaching end of partition.
 
     Parameters
     ----------
     msg : Kafka message
         The Kafka message result from consumer.poll().
     """
-    if msg.error().code() == confluent_kafka.KafkaError._PARTITION_EOF:
-        sys.stderr.write('topic:%s, partition:%d, status:end, offset:%d, key:%s, time:%.3f\n' %
-                         (msg.topic(), msg.partition(), msg.offset(), str(msg.key()),  time.time()))
-    elif msg.error():
-        raise confluent_kafka.KafkaException(msg.error())
-    return
+    def __init__(self, msg):
+        message = 'topic:%s, partition:%d, status:end, offset:%d, key:%s, time:%.3f\n' % (msg.topic(),
+                                                                                          msg.partition(),
+                                                                                          msg.offset(),
+                                                                                          str(msg.key()),
+                                                                                          time.time())
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 
 class AlertConsumer(object):
@@ -52,26 +61,18 @@ class AlertConsumer(object):
         decode : `boolean`
             If True, decodes data from Avro format.
         verbose: `boolean`
-            If True, returns every message. If False, returns only end of partition messages.
+            If True, returns every message. If False, only raises EopError.
         """
-        if decode is False:
-            msg = self.consumer.poll()
+        msg = self.consumer.poll()
 
-            if msg.error():
-                return _writeEopNotice(msg)
-            else:
-                if verbose is True:
-                    return msg.value()
-
+        if msg.error():
+            raise EopError(msg)
         else:
-            msg = self.consumer.poll()
-
-            if msg.error():
-                return _writeEopNotice(msg)
-            else:
-                if verbose is True:
+            if verbose is True:
+                if decode is True:
                     return self.decodeMessage(msg)
-
+                else:
+                    return msg.value()
         return
 
     def decodeMessage(self, msg):
