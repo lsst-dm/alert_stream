@@ -31,6 +31,7 @@ def main():
     schema_files = ["../sample-avro-alert/schema/diasource.avsc",
                     "../sample-avro-alert/schema/diaobject.avsc",
                     "../sample-avro-alert/schema/ssobject.avsc",
+                    "../sample-avro-alert/schema/cutout.avsc",
                     "../sample-avro-alert/schema/alert.avsc"]
 
     # Start consumer and print alert stream
