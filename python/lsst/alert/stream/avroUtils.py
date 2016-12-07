@@ -4,7 +4,7 @@
 import io
 import json
 import avro.schema
-import avro.io
+import fastavro
 
 
 __all__ = ['combineSchemas', 'writeAvroData', 'readAvroData']
@@ -29,24 +29,24 @@ def combineSchemas(schema_files):
 
     Returns
     -------
-    `avro.schema.RecordSchema`
+    `dict`
         Avro schema
     """
     known_schemas = avro.schema.Names()
 
     for s in schema_files:
         schema = _loadSingleAvsc(s, known_schemas)
-    return schema
+    return schema.to_json()
 
 
-def writeAvroData(json_data, avro_schema):
+def writeAvroData(json_data, json_schema):
     """Encode json into Avro format given a schema.
 
     Parameters
     ----------
     json_data : `dict`
         The JSON data containing message content.
-    avro_schema : Avro schema
+    json_schema : `dict`
         The writer Avro schema for encoding data.
 
     Returns
@@ -54,21 +54,19 @@ def writeAvroData(json_data, avro_schema):
     `_io.BytesIO`
         Encoded data.
     """
-    writer = avro.io.DatumWriter(avro_schema)
     bytes_io = io.BytesIO()
-    encoder = avro.io.BinaryEncoder(bytes_io)
-    writer.write(json_data, encoder)
+    fastavro.schemaless_writer(bytes_io, json_schema, json_data)
     return bytes_io
 
 
-def readAvroData(bytes_io, avro_schema):
+def readAvroData(bytes_io, json_schema):
     """Read data and decode with a given Avro schema.
 
     Parameters
     ----------
     bytes_io : `_io.BytesIO`
         Data to be decoded.
-    avro_schema : Avro schema
+    json_schema : `dict`
         The reader Avro schema for decoding data.
 
     Returns
@@ -76,9 +74,6 @@ def readAvroData(bytes_io, avro_schema):
     `dict`
         Decoded data.
     """
-    raw_bytes = bytes_io.getvalue()
-    bytes_reader = io.BytesIO(raw_bytes)
-    decoder = avro.io.BinaryDecoder(bytes_reader)
-    reader = avro.io.DatumReader(avro_schema)
-    message = reader.read(decoder)
+    bytes_io.seek(0)
+    message = fastavro.schemaless_reader(bytes_io, json_schema)
     return message

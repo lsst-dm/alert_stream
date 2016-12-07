@@ -13,6 +13,8 @@ ENV LD_LIBRARY_PATH /usr/local/lib
 # Pip installs.
 RUN pip install confluent-kafka
 RUN pip install avro-python3
+RUN pip install Cython
+RUN pip install fastavro
 
 # Get schemas and template data. # TODO update to checkout master when schema is updated
 WORKDIR /home
