@@ -1,6 +1,7 @@
 from __future__ import print_function
 import io
 import time
+import ast
 import confluent_kafka
 from . import avroUtils
 
@@ -72,7 +73,8 @@ class AlertConsumer(object):
                 if decode is True:
                     return self.decodeMessage(msg)
                 else:
-                    return msg.value()
+                    ast_msg = ast.literal_eval(str(msg.value(), encoding='utf-8'))
+                    return ast_msg
         return
 
     def decodeMessage(self, msg):

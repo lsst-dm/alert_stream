@@ -82,6 +82,8 @@ def main():
             sys.stderr.write(e.message)
         except IndexError:
             sys.stderr.write('%% Data cannot be decoded\n')
+        except UnicodeDecodeError:
+            sys.stderr.write('%% Unexpected data format received\n')
         except KeyboardInterrupt:
             sys.stderr.write('%% Aborted by user\n')
             sys.exit()
