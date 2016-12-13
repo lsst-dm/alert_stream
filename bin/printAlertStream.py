@@ -9,7 +9,32 @@ To run multiple consumers each printing all messages, each consumer needs a diff
 from __future__ import print_function
 import argparse
 import sys
+import os
 from lsst.alert.stream import alertConsumer
+
+
+def msg_text(message):
+    """Remove postage stamp cutouts from an alert message.
+    """
+    message_text = {k: message[k] for k in message if k not in ['cutoutDifference', 'cutoutTemplate']}
+    return message_text
+
+
+def write_stamp_file(stamp_dict, output_dir):
+    """Given a stamp dict that follows the cutout schema, write data to a file in a given directory.
+    """
+    try:
+        filename = stamp_dict['fileName']
+        try:
+            os.makedirs(output_dir)
+        except OSError:
+            pass
+        out_path = os.path.join(output_dir, filename)
+        with open(out_path, 'wb') as f:
+            f.write(stamp_dict['stampData'])
+    except TypeError:
+        sys.stderr.write('%% Cannot get stamp\n')
+    return
 
 
 def main():
@@ -20,6 +45,9 @@ def main():
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
                         '(i.e., only one consumer will receive a message, as in a queue).')
+    parser.add_argument('--stampDir', type=str,
+                        help='Output directory for writing postage stamp cutout files.')
+
     args = parser.parse_args()
 
     # Configure consumer connection to Kafka broker
@@ -44,7 +72,10 @@ def main():
             if msg is None:
                 continue
             else:
-                print(msg)
+                print(msg_text(msg))
+                if args.stampDir:  # Collect postage stamps
+                    write_stamp_file(msg.get('cutoutDifference'), args.stampDir)
+                    write_stamp_file(msg.get('cutoutTemplate'), args.stampDir)
 
         except alertConsumer.EopError as e:
             # Write when reaching end of partition
