@@ -32,7 +32,12 @@ def main():
                             help='Send postage stamp cutouts. (default)')
     stampgroup.add_argument('--no-stamps', dest='stamps', action='store_false',
                             help='Do not send postage stamp cutouts.')
-    parser.set_defaults(stamps=True)
+    avrogroup = parser.add_mutually_exclusive_group()
+    avrogroup.add_argument('--encode', dest='avroFlag', action='store_true',
+                           help='Encode to Avro format. (default)')
+    avrogroup.add_argument('--encode-off', dest='avroFlag', action='store_false',
+                           help='Do not encode to Avro format.')
+    parser.set_defaults(stamps=True, avroFlag=True)
 
     args = parser.parse_args()
 
@@ -66,7 +71,7 @@ def main():
 
     # Send alerts to producer
     for i in range(args.alertnum):
-        streamProducer.send(json_data, encode=True)
+        streamProducer.send(json_data, encode=args.avroFlag)
     streamProducer.flush()
     finish_time = time.time()
 

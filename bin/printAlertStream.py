@@ -47,6 +47,12 @@ def main():
                         '(i.e., only one consumer will receive a message, as in a queue).')
     parser.add_argument('--stampDir', type=str,
                         help='Output directory for writing postage stamp cutout files.')
+    avrogroup = parser.add_mutually_exclusive_group()
+    avrogroup.add_argument('--decode', dest='avroFlag', action='store_true',
+                           help='Decode from Avro format. (default)')
+    avrogroup.add_argument('--decode-off', dest='avroFlag', action='store_false',
+                           help='Do not decode from Avro format.')
+    parser.set_defaults(avroFlag=True)
 
     args = parser.parse_args()
 
@@ -67,7 +73,7 @@ def main():
 
     while True:
         try:
-            msg = streamReader.poll(decode=True)
+            msg = streamReader.poll(decode=args.avroFlag)
 
             if msg is None:
                 continue
