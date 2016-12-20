@@ -27,10 +27,11 @@ def main():
                         help='Name of Kafka topic stream to push to.')
     parser.add_argument('alertnum', type=int,
                         help='Number of alerts to send.')
-    parser.add_argument('--stamps', dest='stamps', action='store_true',
-                        help='Send postage stamp cutouts.')
-    parser.add_argument('--no-stamps', dest='stamps', action='store_false',
-                        help='Do not send postage stamp cutouts.')
+    stampgroup = parser.add_mutually_exclusive_group()
+    stampgroup.add_argument('--stamps', dest='stamps', action='store_true',
+                            help='Send postage stamp cutouts. (default)')
+    stampgroup.add_argument('--no-stamps', dest='stamps', action='store_false',
+                            help='Do not send postage stamp cutouts.')
     parser.set_defaults(stamps=True)
 
     args = parser.parse_args()
