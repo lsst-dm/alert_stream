@@ -57,7 +57,7 @@ def main():
     args = parser.parse_args()
 
     # Configure consumer connection to Kafka broker
-    conf = {'bootstrap.servers': 'localhost:9092',
+    conf = {'bootstrap.servers': 'kafka:9092',
             'group.id': args.group,
             'default.topic.config': {'auto.offset.reset': 'smallest'}}
 

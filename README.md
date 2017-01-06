@@ -20,6 +20,8 @@ From the alert_stream directory:
 $ docker-compose up -d
 ```
 
+This will create a network named `alertstream_default` with the default driver over which the other containers will connect.
+
 **Build docker container**
 
 From the alert_stream directory:
@@ -39,7 +41,7 @@ $ docker run -it alert_stream python bin/sendAlertStream.py -h
 Start an alert stream to topic “my-stream” with 100 alerts:
 
 ```
-$ docker run -it --network=host alert_stream python bin/sendAlertStream.py my-stream 100
+$ docker run -it --network=alertstream_default alert_stream python bin/sendAlertStream.py my-stream 100
 ```
 
 To exclude sending postage stamp cutouts, add the optional flag to the python command `--no-stamps`.
@@ -51,13 +53,13 @@ Avro encoding is turned on by default to enforce a schema. To turn this off, add
 To start a consumer for monitoring "my-stream", which will consume a stream and print only End of Partition status messages:
 
 ```
-$ docker run -it --network=host alert_stream python bin/monitorStream.py my-stream monitor-group
+$ docker run -it --network=alertstream_default alert_stream python bin/monitorStream.py my-stream monitor-group
 ```
 
 To start a consumer for printing all alerts in the stream "my-stream":
 
 ```
-$ docker run -it --network=host alert_stream python bin/printStream.py my-stream echo-group
+$ docker run -it --network=alertstream_default alert_stream python bin/printStream.py my-stream echo-group
 ```
 
 By default, `printStream.py` will not collect postage stamp cutouts. To enable postage stamp collection, specify a directory to which files should be written with the optional flag `--stampDir <directory name>`. If run using a Docker container, the stamps will be collected within the container.
@@ -92,5 +94,5 @@ $ docker run -it alert_stream python
 To collect postage stamp cutouts to your local machine, you can mount a local directory and give the Docker container write access with, e.g., the following command:
 
 ```
-$ docker run -it --network=host -v $PWD/stamps:/home/alert_stream/stamps:rw alert_stream python bin/printStream.py my-stream echo-group --stampDir stamps
+$ docker run -it --network=alertstream_default -v $PWD/stamps:/home/alert_stream/stamps:rw alert_stream python bin/printStream.py my-stream echo-group --stampDir stamps
 ```
