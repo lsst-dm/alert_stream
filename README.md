@@ -7,8 +7,8 @@ This uses [Confluent's Kafka client for Python](https://github.com/confluentinc/
 
 Requires Docker and Docker Compose for the usage instructions below.
 
-Usage
------
+Usage (single host)
+-------------------
 
 Clone repo, cd into directory, and checkout appropriate branch.
 
@@ -75,6 +75,55 @@ $ docker-compose down
 ```
 
 Find alert_stream container names with `docker ps` and shut down with `docker stop [name]`.
+
+Usage (multiple hosts with Docker Swarm mode)
+---------------------------------------------
+
+**Set up multiple hosts**
+
+If necessary, create multiple hosts, e.g., with docker-machine, then create a swarm, and set up all hosts with access to an `alert_stream` image. See e.g., `docker/setup-hosts.sh`.
+
+**Create overlay network**
+
+On a Swarm manager node, assuming all nodes have been configured as above, create an overlay network for use by the alert_stream app.
+
+```
+docker@node1:~$ docker network create --driver overlay kafkanet
+```
+
+**Deploy services**
+
+Start a zookeeper service:
+
+```
+docker@node1:~$ docker service create --name zookeeper --network kafkanet -p 2181 wurstmeister/zookeeper
+```
+
+Start a kafka service:
+
+```
+docker@node1:~$ docker service create --name  kafka --network kafkanet -p 9092 -e KAFKA_ADVERTISED_HOST_NAME=kafka confluent/kafka
+```
+
+Send some alerts:
+
+```
+docker@node1:~$ docker service create  --name producer1 --network kafkanet alert_stream python bin/sendAlertStream.py my-stream 10
+```
+
+Listen and print alerts:
+
+```
+docker@node1:~$ docker service create  --name consumer1 --network kafkanet alert_stream python bin/printStream.py my-stream echo-group
+```
+
+Monitor alerts:
+
+```
+docker@node1:~$ docker service create  --name consumer2 --network kafkanet alert_stream python bin/monitorStream.py my-stream monitor-group
+```
+
+Services are running in the background, but output can be observed by attaching to individual containers or by checking the docker logs on whichever host they are deployed.
 
 Notes
 -----
