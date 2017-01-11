@@ -41,7 +41,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic to listen to.')
-    parser.add_argument('group', type=str,
+    parser.add_argument('--group', type=str,
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
                         '(i.e., only one consumer will receive a message, as in a queue).')
@@ -58,8 +58,8 @@ def main():
 
     # Configure consumer connection to Kafka broker
     conf = {'bootstrap.servers': 'kafka:9092',
-            'group.id': args.group,
             'default.topic.config': {'auto.offset.reset': 'smallest'}}
+    conf['group.id'] = args.group
 
     # Configure Avro reader schema
     schema_files = ["../sample-avro-alert/schema/diasource.avsc",
