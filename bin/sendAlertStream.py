@@ -42,7 +42,7 @@ def main():
     args = parser.parse_args()
 
     # Configure producer connection to Kafka broker
-    conf = {'bootstrap.servers': 'localhost:9092'}
+    conf = {'bootstrap.servers': 'kafka:9092'}
 
     # Configure Avro writer schema and data
     schema_files = ["../sample-avro-alert/schema/diasource.avsc",

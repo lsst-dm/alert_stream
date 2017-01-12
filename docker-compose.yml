@@ -1,9 +1,9 @@
-version: '2'
+version: '2.1'
 services:
   kafka:
     image: confluent/kafka
     environment:
-      - KAFKA_ADVERTISED_HOST_NAME=localhost
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
     ports:
       - "9092:9092"
     links:
