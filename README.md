@@ -38,7 +38,7 @@ $ docker run -it alert_stream python bin/sendAlertStream.py -h
 
 **Start producing an alert stream**
 
-Start an alert stream to topic “my-stream” with 100 alerts:
+Send alerts to topic “my-stream” with 100 alerts:
 
 ```
 $ docker run -it \
@@ -49,6 +49,8 @@ $ docker run -it \
 To exclude sending postage stamp cutouts, add the optional flag to the python command `--no-stamps`.
 
 Avro encoding is turned on by default to enforce a schema. To turn this off, add the optional flag `--encode-off`.
+
+To start a continuous stream of alerts that emits batches every 39 seconds, add the optional flag `--repeat`. The default is to emit 2215 batches (~24 hours). The optional flag `--max-repeats` can be used to override the default.
 
 **Consume alert stream**
 
@@ -120,13 +122,13 @@ docker@node1:~$ docker service create \
                     confluent/kafka
 ```
 
-Send 10 alerts to the topic named 'my-stream':
+Start stream of bursts of 10 alerts to the topic named 'my-stream':
 
 ```
 docker@node1:~$ docker service create \
                     --name producer1 \
                     --network kafkanet \
-                    alert_stream python bin/sendAlertStream.py my-stream 10
+                    alert_stream python bin/sendAlertStream.py my-stream 10 --repeat
 ```
 
 Listen and print alerts:
