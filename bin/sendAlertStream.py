@@ -59,7 +59,8 @@ def main():
     avrogroup = parser.add_mutually_exclusive_group()
     avrogroup.add_argument('--encode', dest='avroFlag', action='store_true',
                            help='Encode to Avro format. (default)')
-    avrogroup.add_argument('--encode-off', dest='avroFlag', action='store_false',
+    avrogroup.add_argument('--encode-off', dest='avroFlag',
+                           action='store_false',
                            help='Do not encode to Avro format.')
     parser.add_argument('--repeat', action='store_true',
                         help='Send alert batches repeating every 39th second.'
@@ -93,7 +94,8 @@ def main():
         json_data['cutoutTemplate'] = load_stamp(cutouttemp_path)
 
     # Configure Kafka producer with topic and schema
-    streamProducer = alertProducer.AlertProducer(args.topic, schema_files, **conf)
+    streamProducer = alertProducer.AlertProducer(
+                        args.topic, schema_files, **conf)
 
     def send_batch():
         start_time = time.time()

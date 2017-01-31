@@ -1,8 +1,8 @@
 from __future__ import print_function
 import io
 import time
-import ast
 import confluent_kafka
+from ast import literal_eval
 from . import avroUtils
 
 
@@ -24,11 +24,10 @@ class EopError(AlertError):
         The Kafka message result from consumer.poll().
     """
     def __init__(self, msg):
-        message = 'topic:%s, partition:%d, status:end, offset:%d, key:%s, time:%.3f\n' % (msg.topic(),
-                                                                                          msg.partition(),
-                                                                                          msg.offset(),
-                                                                                          str(msg.key()),
-                                                                                          time.time())
+        message = 'topic:%s, partition:%d, status:end, ' \
+                  'offset:%d, key:%s, time:%.3f\n' \
+                  % (msg.topic(), msg.partition(),
+                     msg.offset(), str(msg.key()), time.time())
         self.message = message
 
     def __str__(self):
@@ -73,7 +72,7 @@ class AlertConsumer(object):
                 if decode is True:
                     return self.decodeMessage(msg)
                 else:
-                    ast_msg = ast.literal_eval(str(msg.value(), encoding='utf-8'))
+                    ast_msg = literal_eval(str(msg.value(), encoding='utf-8'))
                     return ast_msg
         return
 
@@ -95,6 +94,6 @@ class AlertConsumer(object):
         try:
             decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
         except AssertionError:
-            # FIXME this exception is being raised but not sure if it matters yet
+            # FIXME this exception is raised but not sure if it matters yet
             decoded_msg = None
         return decoded_msg

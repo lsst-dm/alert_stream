@@ -25,7 +25,8 @@ def combineSchemas(schema_files):
     Parameters
     ----------
     schema_files : `list`
-        List of files containing schemas.  If nested, most internal schema must be first.
+        List of files containing schemas.
+        If nested, most internal schema must be first.
 
     Returns
     -------
