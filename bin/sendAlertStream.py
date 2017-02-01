@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-"""Generates batches of alerts coming from a CCD given template alert content.
+"""Generates batches of alerts coming from a CCD given template alert
+content.
 """
 
 from __future__ import print_function
@@ -25,6 +26,13 @@ def load_stamp(file_path):
 @asyncio.coroutine
 def delay(wait_sec, function):
     """Sleep for a given time before calling a function.
+
+    Parameters
+    ----------
+    wait_sec
+        Time in seconds to sleep before calling `function`.
+    function
+        Function to return after sleeping.
     """
     print('delay starting: {}'.format(time.time()))
     yield from asyncio.sleep(wait_sec)
@@ -35,6 +43,19 @@ def delay(wait_sec, function):
 
 @asyncio.coroutine
 def schedule_delays(eventloop, function, maxcounts, interval=39):
+    """Schedule delayed calls of a function at a repeating interval.
+
+    Parameters
+    ----------
+    eventloop
+        Event loop returned by asyncio.get_event_loop().
+    function
+        Function to be scheduled.
+    maxcounts
+        Maximum number of times `function` should be called.
+    interval
+        Time in seconds between calls.
+    """
     counter = 0
     while counter < maxcounts:
         wait_time = interval - (time.time() % interval)

@@ -60,7 +60,7 @@ class AlertConsumer(object):
         ----------
         decode : `boolean`
             If True, decodes data from Avro format.
-        verbose: `boolean`
+        verbose : `boolean`
             If True, returns every message. If False, only raises EopError.
         """
         msg = self.consumer.poll()
