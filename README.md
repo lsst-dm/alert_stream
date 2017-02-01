@@ -128,6 +128,7 @@ Start stream of bursts of 10 alerts to the topic named 'my-stream':
 docker@node1:~$ docker service create \
                     --name producer1 \
                     --network kafkanet \
+                    -e PYTHONUNBUFFERED=0 \
                     alert_stream python bin/sendAlertStream.py my-stream 10 --repeat
 ```
 
@@ -137,6 +138,7 @@ Listen and print alerts:
 docker@node1:~$ docker service create \
                     --name consumer1 \
                     --network kafkanet \
+                    -e PYTHONUNBUFFERED=0 \
                     alert_stream python bin/printStream.py my-stream
 ```
 
@@ -146,6 +148,7 @@ Start group for monitoring alerts:
 docker@node1:~$ docker service create \
                     --name consumer2 \
                     --network kafkanet \
+                    -e PYTHONUNBUFFERED=0 \
                     alert_stream python bin/monitorStream.py my-stream --group monitor-group
 ```
 
