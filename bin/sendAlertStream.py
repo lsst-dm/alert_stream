@@ -34,11 +34,11 @@ def delay(wait_sec, function):
 
 
 @asyncio.coroutine
-def schedule_delays(eventloop, function, maxcounts):
+def schedule_delays(eventloop, function, maxcounts, interval=39):
     counter = 0
     while counter < maxcounts:
-        seconds_to_minute = 39 - (time.time() % 39)  # on the 39th second
-        yield from asyncio.ensure_future(delay(seconds_to_minute, function))
+        wait_time = interval - (time.time() % interval)
+        yield from asyncio.ensure_future(delay(wait_time, function))
         counter += 1
         print('batches finished: {}'.format(counter))
     else:
