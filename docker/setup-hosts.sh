@@ -28,5 +28,5 @@ done
 for N in $(seq 1 $NODES)
 do
 docker-machine ssh node$N 'git clone https://github.com/lsst-dm/alert_stream.git && cd alert_stream \
- && git checkout tickets/DM-8537 && docker build -t "alert_stream" .'
+ && git checkout tickets/DM-7455 && docker build -t "alert_stream" .'
 done

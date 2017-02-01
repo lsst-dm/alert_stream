@@ -3,7 +3,8 @@
 """Consumes stream for printing all messages to the console.
 
 Note that consumers with the same group ID share a stream.
-To run multiple consumers each printing all messages, each consumer needs a different group.
+To run multiple consumers each printing all messages,
+each consumer needs a different group.
 """
 
 from __future__ import print_function
@@ -16,12 +17,14 @@ from lsst.alert.stream import alertConsumer
 def msg_text(message):
     """Remove postage stamp cutouts from an alert message.
     """
-    message_text = {k: message[k] for k in message if k not in ['cutoutDifference', 'cutoutTemplate']}
+    message_text = {k: message[k] for k in message
+                    if k not in ['cutoutDifference', 'cutoutTemplate']}
     return message_text
 
 
 def write_stamp_file(stamp_dict, output_dir):
-    """Given a stamp dict that follows the cutout schema, write data to a file in a given directory.
+    """Given a stamp dict that follows the cutout schema,
+       write data to a file in a given directory.
     """
     try:
         filename = stamp_dict['fileName']
@@ -44,13 +47,16 @@ def main():
     parser.add_argument('--group', type=str,
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
-                        '(i.e., only one consumer will receive a message, as in a queue).')
+                        '(i.e., only one consumer will receive a message, '
+                        'as in a queue).')
     parser.add_argument('--stampDir', type=str,
-                        help='Output directory for writing postage stamp cutout files.')
+                        help='Output directory for writing postage stamp'
+                        'cutout files.')
     avrogroup = parser.add_mutually_exclusive_group()
     avrogroup.add_argument('--decode', dest='avroFlag', action='store_true',
                            help='Decode from Avro format. (default)')
-    avrogroup.add_argument('--decode-off', dest='avroFlag', action='store_false',
+    avrogroup.add_argument('--decode-off', dest='avroFlag',
+                           action='store_false',
                            help='Do not decode from Avro format.')
     parser.set_defaults(avroFlag=True)
 
@@ -69,7 +75,8 @@ def main():
                     "../sample-avro-alert/schema/alert.avsc"]
 
     # Start consumer and print alert stream
-    streamReader = alertConsumer.AlertConsumer(args.topic, schema_files, **conf)
+    streamReader = alertConsumer.AlertConsumer(
+                        args.topic, schema_files, **conf)
 
     while True:
         try:
@@ -80,8 +87,10 @@ def main():
             else:
                 print(msg_text(msg))
                 if args.stampDir:  # Collect postage stamps
-                    write_stamp_file(msg.get('cutoutDifference'), args.stampDir)
-                    write_stamp_file(msg.get('cutoutTemplate'), args.stampDir)
+                    write_stamp_file(
+                        msg.get('cutoutDifference'), args.stampDir)
+                    write_stamp_file(
+                        msg.get('cutoutTemplate'), args.stampDir)
 
         except alertConsumer.EopError as e:
             # Write when reaching end of partition

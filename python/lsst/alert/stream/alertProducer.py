@@ -30,7 +30,7 @@ class AlertProducer(object):
         Parameters
         ----------
         data : message content
-            Data containing message content.  If encode is True, expects JSON format.
+            Data containing message content.  If encode is True, expects JSON.
         encode : `boolean`
             If True, encodes data to Avro format. If False, sends data raw.
         """

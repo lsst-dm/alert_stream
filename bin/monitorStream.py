@@ -19,7 +19,8 @@ def main():
     parser.add_argument('--group', type=str,
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
-                        '(i.e., only one consumer will receive a message, as in a queue).')
+                        '(i.e., only one consumer will receive a message, '
+                        'as in a queue).')
     args = parser.parse_args()
 
     # Configure consumer connection to Kafka broker
