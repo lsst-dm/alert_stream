@@ -159,7 +159,8 @@ Notes
 
 Note well that currently the repo contents are copied into the Docker image on build, so any changes to the code require rebuilding the image if using Docker.
 
-Also note that consumers with the same group ID share a stream so that only one consumer in the group will receive a message (as in a queue).
+Also note that consumers with the same group ID share a stream so that only one consumer in the group will receive a message (as in a queue).  If no group ID is set, the default is $HOSTNAME.  In Docker,
+this will be the running container's shortened UUID.
 
 **On Docker**
 

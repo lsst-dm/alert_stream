@@ -48,7 +48,7 @@ def main():
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
                         '(i.e., only one consumer will receive a message, '
-                        'as in a queue).')
+                        'as in a queue). Default is value of $HOSTNAME.')
     parser.add_argument('--stampDir', type=str,
                         help='Output directory for writing postage stamp'
                         'cutout files.')
@@ -65,7 +65,10 @@ def main():
     # Configure consumer connection to Kafka broker
     conf = {'bootstrap.servers': 'kafka:9092',
             'default.topic.config': {'auto.offset.reset': 'smallest'}}
-    conf['group.id'] = args.group
+    if args.group:
+        conf['group.id'] = args.group
+    else:
+        conf['group.id'] = os.environ['HOSTNAME']
 
     # Configure Avro reader schema
     schema_files = ["../sample-avro-alert/schema/diasource.avsc",
