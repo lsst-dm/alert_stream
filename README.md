@@ -3,7 +3,8 @@ alert_stream
 
 Mock alert stream distribution system using Kafka producers and consumers.
 
-This uses [Confluent's Kafka client for Python](https://github.com/confluentinc/confluent-kafka-python), which wraps the librdkafka C library. The librdkafka C library is installed into the Docker container built with the accompanying Dockerfile.
+This uses [Confluent's Kafka client for Python](https://github.com/confluentinc/confluent-kafka-python), which wraps the librdkafka C library.
+The librdkafka C library is installed into the Docker container built with the accompanying Dockerfile.
 
 Requires Docker and Docker Compose for the usage instructions below.
 
@@ -50,7 +51,9 @@ To exclude sending postage stamp cutouts, add the optional flag to the python co
 
 Avro encoding is turned on by default to enforce a schema. To turn this off, add the optional flag `--encode-off`.
 
-To start a continuous stream of alerts that emits batches every 39 seconds, add the optional flag `--repeat`. The default is to emit 2215 batches (~24 hours). The optional flag `--max-repeats` can be used to override the default.
+To start a continuous stream of alerts that emits batches every 39 seconds, add the optional flag `--repeat`.
+The default is to emit 2215 batches (~24 hours).
+The optional flag `--max-repeats` can be used to override the default.
 
 **Consume alert stream**
 
@@ -70,7 +73,9 @@ $ docker run -it \
       alert_stream python bin/printStream.py my-stream
 ```
 
-By default, `printStream.py` will not collect postage stamp cutouts. To enable postage stamp collection, specify a directory to which files should be written with the optional flag `--stampDir <directory name>`. If run using a Docker container, the stamps will be collected within the container.
+By default, `printStream.py` will not collect postage stamp cutouts.
+To enable postage stamp collection, specify a directory to which files should be written with the optional flag `--stampDir <directory name>`.
+If run using a Docker container, the stamps will be collected within the container.
 
 Avro decoding is turned on by default. To turn this off, add the optional flag `--decode-off`.
 
@@ -89,7 +94,8 @@ Usage (multiple hosts with Docker Swarm mode)
 
 **Set up multiple hosts**
 
-If necessary, create multiple hosts, e.g., with docker-machine, then create a swarm, and set up all hosts with access to an `alert_stream` image. See e.g., `docker/setup-hosts.sh`.
+If necessary, create multiple hosts, e.g., with docker-machine, then create a swarm, and set up all hosts with access to an `alert_stream` image.
+See e.g., `docker/setup-hosts.sh`.
 
 **Create overlay network**
 
@@ -159,8 +165,9 @@ Notes
 
 Note well that currently the repo contents are copied into the Docker image on build, so any changes to the code require rebuilding the image if using Docker.
 
-Also note that consumers with the same group ID share a stream so that only one consumer in the group will receive a message (as in a queue).  If no group ID is set, the default is $HOSTNAME.  In Docker,
-this will be the running container's shortened UUID.
+Also note that consumers with the same group ID share a stream so that only one consumer in the group will receive a message (as in a queue).
+If no group ID is set, the default is $HOSTNAME.
+In Docker, this will be the running container's shortened UUID.
 
 **On Docker**
 
