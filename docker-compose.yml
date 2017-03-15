@@ -1,16 +1,21 @@
-version: '2.1'
+version: '3.1'
+
 services:
-  kafka:
-    image: confluent/kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
     environment:
-      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - ZOOKEEPER_CLIENT_PORT=32181
+      - ZOOKEEPER_TICK_TIME=2000
     ports:
-      - "9092:9092"
-    links:
-      - zookeeper
+        - "32181:32181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
-  zookeeper:
-    image: wurstmeister/zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
     ports:
-        - "2181:2181"
+      - "9092:9092"
