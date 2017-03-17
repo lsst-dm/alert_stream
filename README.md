@@ -113,8 +113,10 @@ Start a zookeeper service:
 docker@node1:~$ docker service create \
                     --name zookeeper \
                     --network kafkanet \
-                    -p 2181 \
-                    wurstmeister/zookeeper
+                    -p 32181 \
+                    -e ZOOKEEPER_CLIENT_PORT=32181 \
+                    -e ZOOKEEPER_TICK_TIME=2000 \
+                    confluentinc/cp-zookeeper
 ```
 
 Start a kafka service:
@@ -124,8 +126,10 @@ docker@node1:~$ docker service create \
                     --name kafka \
                     --network kafkanet \
                     -p 9092 \
-                    -e KAFKA_ADVERTISED_HOST_NAME=kafka \
-                    confluent/kafka
+                    -e KAFKA_BROKER_ID=1 \
+                    -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181 \
+                    -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
+                    confluentinc/cp-kafka
 ```
 
 Start stream of bursts of 10 alerts to the topic named 'my-stream':

@@ -1,11 +1,11 @@
-# Version: 0.0.2
-FROM python:3.5
-MAINTAINER Maria Patterson "maria.t.patterson@gmail.com"
-ENV REFRESHED_AT 2016-12-06
+# Version: 0.0.3
+FROM python:3.6
+LABEL maintainer "maria.t.patterson@gmail.com"
+ENV REFRESHED_AT 2017-03-14
 
 # Install library for confluent-kafka python.
 WORKDIR /home
-RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && git checkout tags/v0.9.2
+RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && git checkout tags/v0.9.4
 WORKDIR /home/librdkafka
 RUN ./configure && make && make install
 ENV LD_LIBRARY_PATH /usr/local/lib
