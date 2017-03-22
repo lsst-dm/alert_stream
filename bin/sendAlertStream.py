@@ -96,14 +96,13 @@ def main():
     conf = {'bootstrap.servers': 'kafka:9092'}
 
     # Configure Avro writer schema and data
-    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
-                    "../sample-avro-alert/schema/diaobject.avsc",
-                    "../sample-avro-alert/schema/ssobject.avsc",
-                    "../sample-avro-alert/schema/cutout.avsc",
-                    "../sample-avro-alert/schema/alert.avsc"]
-    json_path = "../sample-avro-alert/data/alert.json"
-    cutoutdiff_path = "../sample-avro-alert/examples/stamp-676.fits"
-    cutouttemp_path = "../sample-avro-alert/examples/stamp-677.fits"
+    schema_files = ["../ztf-avro-alert/schema/candidate.avsc",
+                    "../ztf-avro-alert/schema/cutout.avsc",
+                    "../ztf-avro-alert/schema/alert.avsc"]
+    json_path = "../ztf-avro-alert/data/alert.json"
+    cutoutdiff_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_pid-8770446315_targ_scimref.jpg"
+    cutouttemp_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_ref.jpg"
+    cutoutsci_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_pid-8770446315_targ_sci.jpg"
 
     # Load template alert contents
     with open(json_path) as file_text:
@@ -113,6 +112,7 @@ def main():
     if args.stamps:
         json_data['cutoutDifference'] = load_stamp(cutoutdiff_path)
         json_data['cutoutTemplate'] = load_stamp(cutouttemp_path)
+        json_data['cutoutScience'] = load_stamp(cutoutsci_path)
 
     # Configure Kafka producer with topic and schema
     streamProducer = alertProducer.AlertProducer(
