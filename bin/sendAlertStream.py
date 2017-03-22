@@ -42,7 +42,7 @@ def delay(wait_sec, function):
 
 
 @asyncio.coroutine
-def schedule_delays(eventloop, function, maxcounts, interval=39):
+def schedule_delays(eventloop, function, maxcounts, interval=45):
     """Schedule delayed calls of a function at a repeating interval.
 
     Parameters
@@ -84,7 +84,7 @@ def main():
                            action='store_false',
                            help='Do not encode to Avro format.')
     parser.add_argument('--repeat', action='store_true',
-                        help='Send alert batches repeating every 39th second.'
+                        help='Send alert batches repeating every 45th second.'
                         ' Default of 2215 batches (~24 hours).')
     parser.add_argument('--max-repeats', type=int, dest='batchnum',
                         help='Override default number of batches to send.')
