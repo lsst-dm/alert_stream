@@ -1,4 +1,4 @@
-alert_stream
+docker-compose up -dualert_stream
 ============
 
 Mock alert stream distribution system using Kafka producers and consumers.

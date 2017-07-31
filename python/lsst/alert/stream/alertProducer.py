@@ -39,7 +39,8 @@ class AlertProducer(object):
             raw_bytes = avro_bytes.getvalue()
             self.producer.produce(self.topic, raw_bytes)
         else:
-            self.producer.produce(self.topic, str(data))
+            self.producer.produce(self.topic, data)
+            #self.producer.produce(self.topic, str(data))
 
     def flush(self):
         return self.producer.flush()

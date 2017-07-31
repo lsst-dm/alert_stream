@@ -10,7 +10,10 @@ import argparse
 import json
 import os.path
 import asyncio
+from glob import glob
 from lsst.alert.stream import alertProducer
+from avro.datafile import DataFileReader, DataFileWriter
+from avro.io import DatumReader, DatumWriter
 
 
 def load_stamp(file_path):
@@ -24,7 +27,7 @@ def load_stamp(file_path):
 
 
 @asyncio.coroutine
-def delay(wait_sec, function):
+def delay(wait_sec, function, *args):
     """Sleep for a given time before calling a function.
 
     Parameters
@@ -37,12 +40,12 @@ def delay(wait_sec, function):
     print('delay starting: {}'.format(time.time()))
     yield from asyncio.sleep(wait_sec)
     print('delay done sleeping: {}'.format(time.time()))
-    return function()
+    return function(*args)
     print('delay finished: {}'.format(time.time()))
 
 
 @asyncio.coroutine
-def schedule_delays(eventloop, function, maxcounts, interval=39):
+def schedule_delays(eventloop, function, maxcounts, *args, interval=39):
     """Schedule delayed calls of a function at a repeating interval.
 
     Parameters
@@ -59,7 +62,7 @@ def schedule_delays(eventloop, function, maxcounts, interval=39):
     counter = 0
     while counter < maxcounts:
         wait_time = interval - (time.time() % interval)
-        yield from asyncio.ensure_future(delay(wait_time, function))
+        yield from asyncio.ensure_future(delay(wait_time, function, *args))
         counter += 1
         print('batches finished: {}'.format(counter))
     else:
@@ -77,12 +80,12 @@ def main():
                             help='Send postage stamp cutouts. (default)')
     stampgroup.add_argument('--no-stamps', dest='stamps', action='store_false',
                             help='Do not send postage stamp cutouts.')
-    avrogroup = parser.add_mutually_exclusive_group()
-    avrogroup.add_argument('--encode', dest='avroFlag', action='store_true',
-                           help='Encode to Avro format. (default)')
-    avrogroup.add_argument('--encode-off', dest='avroFlag',
-                           action='store_false',
-                           help='Do not encode to Avro format.')
+#    avrogroup = parser.add_mutually_exclusive_group()
+#    avrogroup.add_argument('--encode', dest='avroFlag', action='store_true',
+#                           help='Encode to Avro format. (default)')
+#    avrogroup.add_argument('--encode-off', dest='avroFlag',
+#                           action='store_false',
+#                           help='Do not encode to Avro format.')
     parser.add_argument('--repeat', action='store_true',
                         help='Send alert batches repeating every 39th second.'
                         ' Default of 2215 batches (~24 hours).')
@@ -93,36 +96,49 @@ def main():
     args = parser.parse_args()
 
     # Configure producer connection to Kafka broker
-    conf = {'bootstrap.servers': 'localhost:9092'}
+    conf = {'bootstrap.servers': 'kafka:9092'}
 
     # Configure Avro writer schema and data
-    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
-                    "../sample-avro-alert/schema/diaobject.avsc",
-                    "../sample-avro-alert/schema/ssobject.avsc",
-                    "../sample-avro-alert/schema/cutout.avsc",
-                    "../sample-avro-alert/schema/alert.avsc"]
-    json_path = "../sample-avro-alert/data/alert.json"
-    cutoutdiff_path = "../sample-avro-alert/examples/stamp-676.fits"
-    cutouttemp_path = "../sample-avro-alert/examples/stamp-677.fits"
+    schema_files = ["../ztf-avro-alert/schema/cutout.avsc",
+                    "../ztf-avro-alert/schema/candidate.avsc",
+                    "../ztf-avro-alert/schema/prv_candidate.avsc",
+                    "../ztf-avro-alert/schema/alert.avsc"]
+    #json_path = "../sample-avro-alert/data/alert.json"
+    #cutoutdiff_path = "../sample-avro-alert/examples/stamp-676.fits"
+    #cutouttemp_path = "../sample-avro-alert/examples/stamp-677.fits"
 
-    # Load template alert contents
-    with open(json_path) as file_text:
-        json_data = json.load(file_text)
+    avro_path = '../sample_v1.1_alerts/'
 
-    # Add postage stamp cutouts
-    if args.stamps:
-        json_data['cutoutDifference'] = load_stamp(cutoutdiff_path)
-        json_data['cutoutTemplate'] = load_stamp(cutouttemp_path)
+    avro_files = glob(avro_path + 
+                      'ztf-realtime-04/rc34/20160820/sciprod/*/*/*.avro')
+    n_files = len(avro_files)
 
     # Configure Kafka producer with topic and schema
     streamProducer = alertProducer.AlertProducer(
                         args.topic, schema_files, **conf)
 
-    def send_batch():
+    def read_avro_file(filename):
+        with open(filename,'rb') as f:
+            #yield f.read()
+            freader = DataFileReader(f,DatumReader())
+            for datum in freader:
+                yield datum
+
+    def load_avro_packets(list_of_files):
+        for filename in list_of_files:
+            yield from read_avro_file(filename)
+
+    packet_gen = load_avro_packets(avro_files)
+
+    def send_batch(packet_gen):
         start_time = time.time()
         print('batch start time:{:.3f}'.format(start_time))
         for i in range(args.alertnum):
-            streamProducer.send(json_data, encode=args.avroFlag)
+            try:
+                streamProducer.send(next(packet_gen), encode=False)
+            except StopIteration:
+                # reinitialize 
+                packet_gen = load_avro_packets(avro_files)
         streamProducer.flush()
         finish_time = time.time()
         print('batch finish time:{:.3f}'.format(finish_time))
@@ -132,11 +148,11 @@ def main():
     print('start: {}'.format(time.time()))
     if args.repeat:
         loop = asyncio.get_event_loop()
-        asyncio.ensure_future(schedule_delays(loop, send_batch, args.batchnum))
+        asyncio.ensure_future(schedule_delays(loop, send_batch, args.batchnum, packet_gen))
         loop.run_forever()
         loop.close()
     else:
-        send_batch()
+        send_batch(packet_gen)
     print('finish: {}'.format(time.time()))
 
 
