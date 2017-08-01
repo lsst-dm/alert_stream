@@ -8,6 +8,8 @@ The librdkafka C library is installed into the Docker container built with the a
 
 Requires Docker and Docker Compose for the usage instructions below.
 
+The ZTF branch requires test avro files mounted as a volume to /home/alert_stream/ztf inside the Docker container producing the alert stream.
+
 Usage (single host)
 -------------------
 
