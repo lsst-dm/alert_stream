@@ -98,6 +98,7 @@ def main():
     # Configure Avro writer schema and data
     schema_files = ["../ztf-avro-alert/schema/candidate.avsc",
                     "../ztf-avro-alert/schema/cutout.avsc",
+                    "../ztf-avro-alert/schema/prv_candidate.avsc",
                     "../ztf-avro-alert/schema/alert.avsc"]
     json_path = "../ztf-avro-alert/data/alert.json"
     cutoutdiff_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_pid-8770446315_targ_scimref.jpg"

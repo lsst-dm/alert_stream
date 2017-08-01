@@ -1,7 +1,7 @@
-# Version: 0.0.3
+# Version: 0.0.4
 FROM python:3.6
 LABEL maintainer "maria.t.patterson@gmail.com"
-ENV REFRESHED_AT 2017-03-22
+ENV REFRESHED_AT 2017-08-01
 
 # Install library for confluent-kafka python.
 WORKDIR /home
@@ -18,7 +18,7 @@ RUN pip install fastavro
 
 # Get schemas and template data. # TODO update to checkout master when schema is updated
 WORKDIR /home
-RUN git clone https://github.com/ZwickyTransientFacility/ztf-avro-alert.git && cd ztf-avro-alert && git checkout u/mtpatter
+RUN git clone https://github.com/ZwickyTransientFacility/ztf-avro-alert.git && cd ztf-avro-alert
 
 # Add code.
 RUN mkdir alert_stream
