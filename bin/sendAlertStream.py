@@ -10,6 +10,9 @@ import argparse
 import json
 import os.path
 import asyncio
+from glob import glob
+from avro.io import DatumReader
+from avro.datafile import DataFileReader
 from lsst.alert.stream import alertProducer
 
 
@@ -70,8 +73,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic stream to push to.')
-    parser.add_argument('alertnum', type=int,
-                        help='Number of alerts to send.')
+#    parser.add_argument('alertnum', type=int,
+#                        help='Number of alerts to send.')
     stampgroup = parser.add_mutually_exclusive_group()
     stampgroup.add_argument('--stamps', dest='stamps', action='store_true',
                             help='Send postage stamp cutouts. (default)')
@@ -100,21 +103,11 @@ def main():
                     "../ztf-avro-alert/schema/cutout.avsc",
                     "../ztf-avro-alert/schema/prv_candidate.avsc",
                     "../ztf-avro-alert/schema/alert.avsc"]
-    json_path = "../ztf-avro-alert/data/alert.json"
-    cutoutdiff_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_pid-8770446315_targ_scimref.jpg"
-    cutouttemp_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_ref.jpg"
-    cutoutsci_path = "../ztf-avro-alert/data/ztf_2016122322956_000515_sg_c16_o_q4_candcutouts/candid-87704463155000_pid-8770446315_targ_sci.jpg"
 
-    # Load template alert contents
-    with open(json_path) as file_text:
-        json_data = json.load(file_text)
-
-    # Add postage stamp cutouts
-    if args.stamps:
-        json_data['cutoutDifference'] = load_stamp(cutoutdiff_path)
-        json_data['cutoutTemplate'] = load_stamp(cutouttemp_path)
-        json_data['cutoutScience'] = load_stamp(cutoutsci_path)
-
+    # Configure data to use avro files
+    avro_batch = glob("/home/alert_stream/ztf/ztf-realtime-04/rc34/20160820/sciprod/*/*/*.avro")
+    n_avro = len(avro_batch)
+    print(n_avro)
     # Configure Kafka producer with topic and schema
     streamProducer = alertProducer.AlertProducer(
                         args.topic, schema_files, **conf)
@@ -122,8 +115,10 @@ def main():
     def send_batch():
         start_time = time.time()
         print('batch start time:{:.3f}'.format(start_time))
-        for i in range(args.alertnum):
-            streamProducer.send(json_data, encode=args.avroFlag)
+        for i in range(n_avro):
+            reader = DataFileReader(open(avro_batch[i], 'rb'), DatumReader())
+            for json_data in reader:
+                streamProducer.send(json_data, encode=args.avroFlag)
         streamProducer.flush()
         finish_time = time.time()
         print('batch finish time:{:.3f}'.format(finish_time))
