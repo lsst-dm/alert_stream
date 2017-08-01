@@ -73,6 +73,7 @@ def main():
     # Configure Avro reader schema
     schema_files = ["../ztf-avro-alert/schema/candidate.avsc",
                     "../ztf-avro-alert/schema/cutout.avsc",
+                    "../ztf-avro-alert/schema/prv_candidate.avsc",
                     "../ztf-avro-alert/schema/alert.avsc"]
 
     # Start consumer and print alert stream
