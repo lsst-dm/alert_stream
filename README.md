@@ -116,7 +116,7 @@ docker@node1:~$ docker service create \
                     -p 32181 \
                     -e ZOOKEEPER_CLIENT_PORT=32181 \
                     -e ZOOKEEPER_TICK_TIME=2000 \
-                    confluentinc/cp-zookeeper
+                    confluentinc/cp-zookeeper:3.2.0
 ```
 
 Start a kafka service:
@@ -129,7 +129,7 @@ docker@node1:~$ docker service create \
                     -e KAFKA_BROKER_ID=1 \
                     -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181 \
                     -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
-                    confluentinc/cp-kafka
+                    confluentinc/cp-kafka:3.2.0
 ```
 
 Start stream of bursts of 10 alerts to the topic named 'my-stream':
