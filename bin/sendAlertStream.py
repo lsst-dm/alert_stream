@@ -105,7 +105,7 @@ def main():
                     "../ztf-avro-alert/schema/alert.avsc"]
 
     # Configure data to use avro files
-    avro_batch = glob("/home/alert_stream/ztf/ztf-realtime-04/rc34/20160820/sciprod/*/*/*.avro")
+    avro_batch = glob("../ztf-avro-alert/data/*.avro")
     n_avro = len(avro_batch)
     print(n_avro)
     # Configure Kafka producer with topic and schema

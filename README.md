@@ -8,7 +8,7 @@ The librdkafka C library is installed into the Docker container built with the a
 
 Requires Docker and Docker Compose for the usage instructions below.
 
-The ZTF branch requires test avro files mounted as a volume to /home/alert_stream/ztf inside the Docker container producing the alert stream.
+The ZTF branch uses sampe avro data files from the ztf-avro-alert repo.
 
 Usage (single host)
 -------------------
@@ -41,12 +41,12 @@ $ docker run -it alert_stream python bin/sendAlertStream.py -h
 
 **Start producing an alert stream**
 
-Send alerts to topic “my-stream” with 100 alerts:
+Send alerts to topic “my-stream”:
 
 ```
 $ docker run -it \
       --network=alertstream_default \
-      alert_stream python bin/sendAlertStream.py my-stream 100
+      alert_stream python bin/sendAlertStream.py my-stream
 ```
 
 To exclude sending postage stamp cutouts, add the optional flag to the python command `--no-stamps`.
