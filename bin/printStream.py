@@ -18,7 +18,7 @@ def msg_text(message):
     """Remove postage stamp cutouts from an alert message.
     """
     message_text = {k: message[k] for k in message
-                    if k not in ['cutoutDifference', 'cutoutTemplate']}
+                    if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']}
     return message_text
 
 
@@ -71,11 +71,10 @@ def main():
         conf['group.id'] = os.environ['HOSTNAME']
 
     # Configure Avro reader schema
-    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
-                    "../sample-avro-alert/schema/diaobject.avsc",
-                    "../sample-avro-alert/schema/ssobject.avsc",
-                    "../sample-avro-alert/schema/cutout.avsc",
-                    "../sample-avro-alert/schema/alert.avsc"]
+    schema_files = ["../ztf-avro-alert/schema/candidate.avsc",
+                    "../ztf-avro-alert/schema/cutout.avsc",
+                    "../ztf-avro-alert/schema/prv_candidate.avsc",
+                    "../ztf-avro-alert/schema/alert.avsc"]
 
     # Start consumer and print alert stream
     streamReader = alertConsumer.AlertConsumer(

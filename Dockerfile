@@ -18,7 +18,7 @@ RUN pip install fastavro
 
 # Get schemas and template data. # TODO update to checkout master when schema is updated
 WORKDIR /home
-RUN git clone https://github.com/lsst-dm/sample-avro-alert.git && cd sample-avro-alert && git checkout tickets/DM-8160
+RUN git clone https://github.com/ZwickyTransientFacility/ztf-avro-alert.git && cd ztf-avro-alert
 
 # Add code.
 RUN mkdir alert_stream
