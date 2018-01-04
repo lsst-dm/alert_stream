@@ -87,12 +87,15 @@ def main():
             if msg is None:
                 continue
             else:
-                print(msg_text(msg))
-                if args.stampDir:  # Collect postage stamps
-                    write_stamp_file(
-                        msg.get('cutoutDifference'), args.stampDir)
-                    write_stamp_file(
-                        msg.get('cutoutTemplate'), args.stampDir)
+                for record in msg:
+                    print(msg_text(record))
+                    if args.stampDir:  # Collect postage stamps
+                        write_stamp_file(
+                            record.get('cutoutDifference'), args.stampDir)
+                        write_stamp_file(
+                            record.get('cutoutTemplate'), args.stampDir)
+                        write_stamp_file(
+                            record.get('cutoutScience'), args.stampDir)
 
         except alertConsumer.EopError as e:
             # Write when reaching end of partition
