@@ -41,8 +41,8 @@ send alerts to topic “my-stream” starting with a certain date and pausing fo
 
 ```
       docker run -it \
-      --network=alertstream_default
-      -v $PWD:/home/alert_stream/data
+      --network=alertstream_default \
+      -v $PWD:/home/alert_stream/data \
       epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
 ```
 
