@@ -90,10 +90,15 @@ class AlertConsumer(object):
             Decoded message.
         """
         message = msg.value()
-        bytes_io = io.BytesIO(message)
         try:
+            bytes_io = io.BytesIO(message)
             decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
         except AssertionError:
             # FIXME this exception is raised but not sure if it matters yet
+            bytes_io = io.BytesIO(message)
             decoded_msg = None
+        except IndexError:
+            literal_msg = literal_eval(str(message, encoding='utf-8'))  # works to give bytes
+            bytes_io = io.BytesIO(literal_msg)  # works to give <class '_io.BytesIO'>
+            decoded_msg = avroUtils.readSchemaData(bytes_io)  # yields reader
         return decoded_msg
