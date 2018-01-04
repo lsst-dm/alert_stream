@@ -34,6 +34,8 @@ This should now work:
 $ docker run -it epyc_alerts python bin/sendAlertStream.py -h
 ```
 
+You must rebuild your container every time you modify any of the code.
+
 **Start producing an alert stream**
 
 From the directory containing dates of data (20171227, etc.),
@@ -48,7 +50,7 @@ send alerts to topic “my-stream” starting with a certain date and pausing fo
 
 **Consume alert stream**
 
-To start a consumer for printing all alerts in the stream "my-stream":
+To start a consumer for printing all alerts in the stream "my-stream" to screen:
 
 ```
 $ docker run -it \
@@ -60,7 +62,7 @@ By default, `printStream.py` will not collect postage stamp cutouts.
 To enable postage stamp collection, specify a directory to which files should be written with the optional flag `--stampDir <directory name>`.
 If run using a Docker container, the stamps will be collected within the container.
 
-To collect postage stamp cutoutss locally, you can mount a local directory and give the Docker container write access with, e.g., the following command:
+To collect postage stamp cutouts locally, you can mount a local directory and give the Docker container write access with, e.g., the following command:
 
 ```
 $ docker run -it \
@@ -73,10 +75,10 @@ Be careful not to write your stamps to the main shared data directory.
 
 **Shut down and clean up**
 
-Shutdown Kafka broker system:
+Shutdown Kafka broker system by running the following from the alert_stream directory:
 
 ```
 $ docker-compose down
 ```
 
-Find epyc_alerts containers with `docker ps` and shut down with `docker kill [name]`.
+Find your epyc_alerts containers with `docker ps` and shut down with `docker kill [name]`.
