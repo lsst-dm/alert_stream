@@ -82,3 +82,5 @@ $ docker-compose down
 ```
 
 Find your epyc_alerts containers with `docker ps` and shut down with `docker kill [id]`.
+Running `docker ps` will list existing running containers and can show you if someone
+is already running alert streams before you try starting your own (which may not work).
