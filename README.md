@@ -15,6 +15,7 @@ Clone repo, cd into directory, and checkout appropriate branch.
 From the alert_stream directory:
 
 ```
+$ git checkout u/mtpatter/ztf-epyc
 $ docker-compose up -d
 ```
 
