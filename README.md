@@ -60,9 +60,9 @@ $ docker run -it \
 
 By default, `printStream.py` will not collect postage stamp cutouts.
 To enable postage stamp collection, specify a directory to which files should be written with the optional flag `--stampDir <directory name>`.
-If run using a Docker container, the stamps will be collected within the container.
+If run using a Docker container, the stamps and other files written out will be collected within the container.
 
-To collect postage stamp cutouts locally, you can mount a local directory and give the Docker container write access with, e.g., the following command:
+To collect postage stamp cutouts and output files locally, you can mount a local directory and give the Docker container write access with, e.g., the following command:
 
 ```
 $ docker run -it \
@@ -71,7 +71,7 @@ $ docker run -it \
       epyc_alerts python bin/printStream.py my-stream --stampDir stamps
 ```
 
-Be careful not to write your stamps to the main shared data directory.
+Be careful not to write your output to the main shared data directory.
 
 **Shut down and clean up**
 
@@ -81,4 +81,4 @@ Shutdown Kafka broker system by running the following from the alert_stream dire
 $ docker-compose down
 ```
 
-Find your epyc_alerts containers with `docker ps` and shut down with `docker kill [name]`.
+Find your epyc_alerts containers with `docker ps` and shut down with `docker kill [id]`.
