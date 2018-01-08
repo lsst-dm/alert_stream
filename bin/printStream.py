@@ -42,6 +42,7 @@ def write_stamp_file(stamp_dict, output_dir):
 
 def alert_filter(alert, stampdir):
     """Filter to apply to each alert.
+       See schemas: https://github.com/ZwickyTransientFacility/ztf-avro-alert
     """
     print(msg_text(alert))  # Print main alert data to screen
     if stampdir:  # Collect all postage stamps
