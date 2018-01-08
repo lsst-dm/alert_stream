@@ -40,6 +40,20 @@ def write_stamp_file(stamp_dict, output_dir):
     return
 
 
+def alert_filter(alert, stampdir):
+    """Filter to apply to each alert.
+    """
+    print(msg_text(alert))  # Print main alert data to screen
+    if stampdir:  # Collect all postage stamps
+        write_stamp_file(
+            alert.get('cutoutDifference'), stampdir)
+        write_stamp_file(
+            alert.get('cutoutTemplate'), stampdir)
+        write_stamp_file(
+            alert.get('cutoutScience'), stampdir)
+    return
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('topic', type=str,
@@ -88,14 +102,8 @@ def main():
                 continue
             else:
                 for record in msg:
-                    print(msg_text(record))
-                    if args.stampDir:  # Collect postage stamps
-                        write_stamp_file(
-                            record.get('cutoutDifference'), args.stampDir)
-                        write_stamp_file(
-                            record.get('cutoutTemplate'), args.stampDir)
-                        write_stamp_file(
-                            record.get('cutoutScience'), args.stampDir)
+                    # Apply filter to each alert
+                    alert_filter(record, args.stampDir)
 
         except alertConsumer.EopError as e:
             # Write when reaching end of partition
