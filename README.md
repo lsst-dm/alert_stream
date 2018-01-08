@@ -19,7 +19,7 @@ $ git checkout u/mtpatter/ztf-epyc
 $ docker-compose up -d
 ```
 
-This will create a network named `alertstream_default`, or something similar, with the default driver over which the other containers will connect.
+This will create a network named `alertstream_default`, or something similar, with the default driver over which the other containers will connect and will start Kafka and Zookeeper.
 
 **Build docker container**
 
