@@ -24,10 +24,17 @@ def main():
 
     args = parser.parse_args()
 
+    # Configure Avro writer schema and data
+    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
+                    "../sample-avro-alert/schema/diaobject.avsc",
+                    "../sample-avro-alert/schema/ssobject.avsc",
+                    "../sample-avro-alert/schema/cutout.avsc",
+                    "../sample-avro-alert/schema/alert.avsc"]
+
     # Configure producer connection to Kafka broker
     conf = {'bootstrap.servers': 'kafka:9092'}
     streamProducer = alertProducer.AlertProducer(
-                        args.topic, **conf)
+                        args.topic, schema_files, **conf)
 
     # Scan for avro files
     root = "./data"
