@@ -100,9 +100,8 @@ def main():
             if msg is None:
                 continue
             else:
-                for record in msg:
-                    # Apply filter to each alert
-                    alert_filter(record, args.stampDir)
+                # Apply filter to each alert
+                alert_filter(msg, args.stampDir)
 
         except alertConsumer.EopError as e:
             # Write when reaching end of partition

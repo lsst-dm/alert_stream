@@ -5,22 +5,23 @@ content.
 """
 
 from __future__ import print_function
-import time
 import argparse
-import os
-import glob
-from lsst.alert.stream import alertProducer
+from lsst.alert.stream import alertProducer, avroUtils
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic stream to push to.')
-    parser.add_argument('startdate', type=int,
-                        help='First date from which to read alerts.')
-    parser.add_argument('pause', type=int,
-                        help='Number of seconds to pause between visits.')
-
+    parser.add_argument('avrofile', type=str,
+                        help='File from which to read alerts.')
+    avrogroup = parser.add_mutually_exclusive_group()
+    avrogroup.add_argument('--encode', dest='avroFlag', action='store_true',
+                           help='Encode to Avro format. (default)')
+    avrogroup.add_argument('--encode-off', dest='avroFlag',
+                           action='store_false',
+                           help='Do not encode to Avro format.')
+    parser.set_defaults(avroFlag=True)
 
     args = parser.parse_args()
 
@@ -38,29 +39,13 @@ def main():
 
     # Scan for avro files
     root = "./data"
-    subdirectories = [d for d in os.listdir(os.path.join(root)) if d >= str(args.startdate)]
-    subdirectories.sort()
-    for d in subdirectories:
-        print('date:', d)
-        points = [p for p in os.listdir(os.path.join(root, d))]
-        points.sort()
-        for p in points:
-            visitdirs = [v for v in glob.glob("/".join((root, d, p, 'ccd*/*')))]
-            uvisitquads = [os.path.basename(v) for v in visitdirs]
-            visits = []
-            for u in uvisitquads:
-                visits.append("_".join(u.split("_")[0:4]))
-            visits.sort()
-            visits = set(visits)
-            for v in visits:
-                files = [f for f in glob.glob("/".join((root, d, p, "ccd*", "".join((v, "*/*")))))]
-                print('visit:', v)
-                for f in files:
-                    # Load template alert contents
-                    with open(f, mode='rb') as file_text:
-                        data = file_text.read()
-                        streamProducer.send(data, encode=False)
-                time.sleep(args.pause)
+    afile = "/".join((root, args.avrofile))
+    print('visit:', args.avrofile[7:12])
+    # Load template alert contents
+    with open(afile, mode='rb') as file_data:
+        data = avroUtils.readSchemaData(file_data)
+        for record in data:
+            streamProducer.send(record, encode=True)
 
 
 if __name__ == "__main__":
