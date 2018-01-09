@@ -18,7 +18,7 @@ def msg_text(message):
     """Remove postage stamp cutouts from an alert message.
     """
     message_text = {k: message[k] for k in message
-                    if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']}
+                    if k not in ['cutoutDifference', 'cutoutTemplate']}
     return message_text
 
 
@@ -44,13 +44,11 @@ def alert_filter(alert, stampdir):
     """Filter to apply to each alert.
     """
     print(msg_text(alert))  # Print main alert data to screen
-    if stampdir:  # Collect all postage stamps
+    if stampdir:  # Collect all postage stamps **There are no stamps**
         write_stamp_file(
             alert.get('cutoutDifference'), stampdir)
         write_stamp_file(
             alert.get('cutoutTemplate'), stampdir)
-        write_stamp_file(
-            alert.get('cutoutScience'), stampdir)
     return
 
 
@@ -65,7 +63,7 @@ def main():
                         'as in a queue). Default is value of $HOSTNAME.')
     parser.add_argument('--stampDir', type=str,
                         help='Output directory for writing postage stamp'
-                        'cutout files.')
+                        'cutout files. **THERE ARE NO STAMPS RIGHT NOW.**')
     avrogroup = parser.add_mutually_exclusive_group()
     avrogroup.add_argument('--decode', dest='avroFlag', action='store_true',
                            help='Decode from Avro format. (default)')
@@ -85,10 +83,11 @@ def main():
         conf['group.id'] = os.environ['HOSTNAME']
 
     # Configure Avro reader schema
-    schema_files = ["../ztf-avro-alert/schema/candidate.avsc",
-                    "../ztf-avro-alert/schema/cutout.avsc",
-                    "../ztf-avro-alert/schema/prv_candidate.avsc",
-                    "../ztf-avro-alert/schema/alert.avsc"]
+    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
+                    "../sample-avro-alert/schema/diaobject.avsc",
+                    "../sample-avro-alert/schema/ssobject.avsc",
+                    "../sample-avro-alert/schema/cutout.avsc",
+                    "../sample-avro-alert/schema/alert.avsc"]
 
     # Start consumer and print alert stream
     streamReader = alertConsumer.AlertConsumer(
