@@ -1,7 +1,7 @@
 alert_stream
 ============
 
-Mock Kafka alert stream system Kafka for ZTF data for use specifically on epyc machine.
+Mock Kafka alert stream system Kafka for sims data for use specifically on epyc machine.
 
 Requires Docker and Docker Compose for the usage instructions below.
 
@@ -15,7 +15,7 @@ Clone repo, cd into directory, and checkout appropriate branch.
 From the alert_stream directory:
 
 ```
-$ git checkout u/mtpatter/ztf-epyc
+$ git checkout u/mtpatter/sims-epyc
 $ docker-compose up -d
 ```
 
@@ -26,27 +26,27 @@ This will create a network named `alertstream_default`, or something similar, wi
 From the alert_stream directory:
 
 ```
-$ docker build -t "epyc_alerts" .
+$ docker build -t "sims_alerts" .
 ```
 
 This should now work:
 
 ```
-$ docker run -it epyc_alerts python bin/sendAlertStream.py -h
+$ docker run -it sims_alerts python bin/sendAlertStream.py -h
 ```
 
 You must rebuild your container every time you modify any of the code.
 
 **Start producing an alert stream**
 
-From the directory containing dates of data (20171227, etc.),
-send alerts to topic “my-stream” starting with a certain date and pausing for 5 seconds between visits:
+From the directory containing files of data (alerts_11575.avro, etc.),
+send alerts from that visit to topic “my-stream”:
 
 ```
       docker run -it \
       --network=alertstream_default \
       -v $PWD:/home/alert_stream/data \
-      epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
+      sims_alerts python bin/sendAlertStream.py my-stream alerts_11575.avro
 ```
 
 **Consume alert stream**
@@ -56,9 +56,11 @@ To start a consumer for printing all alerts in the stream "my-stream" to screen:
 ```
 $ docker run -it \
       --network=alertstream_default \
-      epyc_alerts python bin/printStream.py my-stream
+      sims_alerts python bin/printStream.py my-stream
 ```
 
+There currently no stamps in the simulated data.  When we have stamps, the
+instruction below apply.
 By default, `printStream.py` will not collect postage stamp cutouts.
 To enable postage stamp collection, specify a directory to which files should be written with the optional flag `--stampDir <directory name>`.
 If run using a Docker container, the stamps and other files written out will be collected within the container.
@@ -69,7 +71,7 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 $ docker run -it \
       --network=alertstream_default \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
-      epyc_alerts python bin/printStream.py my-stream --stampDir stamps
+      sims_alerts python bin/printStream.py my-stream --stampDir stamps
 ```
 
 Be careful not to write your output to the main shared data directory.
@@ -82,6 +84,6 @@ Shutdown Kafka broker system by running the following from the alert_stream dire
 $ docker-compose down
 ```
 
-Find your epyc_alerts containers with `docker ps` and shut down with `docker kill [id]`.
+Find your sims_alerts containers with `docker ps` and shut down with `docker kill [id]`.
 Running `docker ps` will list existing running containers and can show you if someone
 is already running alert streams before you try starting your own (which may not work).
