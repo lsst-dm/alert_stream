@@ -44,14 +44,16 @@ def alert_filter(alert, stampdir):
     """Filter to apply to each alert.
        See schemas: https://github.com/ZwickyTransientFacility/ztf-avro-alert
     """
-    print(msg_text(alert))  # Print main alert data to screen
-    if stampdir:  # Collect all postage stamps
-        write_stamp_file(
-            alert.get('cutoutDifference'), stampdir)
-        write_stamp_file(
-            alert.get('cutoutTemplate'), stampdir)
-        write_stamp_file(
-            alert.get('cutoutScience'), stampdir)
+    data = msg_text(alert)
+    if data:  # Write your condition statement here
+        print(data)  # Print all main alert data to screen
+        if stampdir:  # Collect all postage stamps
+            write_stamp_file(
+                alert.get('cutoutDifference'), stampdir)
+            write_stamp_file(
+                alert.get('cutoutTemplate'), stampdir)
+            write_stamp_file(
+                alert.get('cutoutScience'), stampdir)
     return
 
 
