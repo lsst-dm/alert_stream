@@ -32,7 +32,7 @@ $ docker build -t "sims_alerts" .
 This should now work:
 
 ```
-$ docker run -it sims_alerts python bin/sendAlertStream.py -h
+$ docker run -it --rm sims_alerts python bin/sendAlertStream.py -h
 ```
 
 You must rebuild your container every time you modify any of the code.
@@ -43,7 +43,7 @@ From the directory containing files of data (alerts_11575.avro, etc.),
 send alerts from that visit to topic “my-stream”:
 
 ```
-      docker run -it \
+      docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
       -v $PWD:/home/alert_stream/data \
@@ -55,7 +55,7 @@ send alerts from that visit to topic “my-stream”:
 To start a consumer for printing all alerts in the stream "my-stream" to screen:
 
 ```
-$ docker run -it \
+$ docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_printer \
       sims_alerts python bin/printStream.py my-stream
@@ -70,7 +70,7 @@ If run using a Docker container, the stamps and other files written out will be 
 To collect postage stamp cutouts and output files locally, you can mount a local directory and give the Docker container write access with, e.g., the following command:
 
 ```
-$ docker run -it \
+$ docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_printer \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
