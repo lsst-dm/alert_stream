@@ -45,6 +45,7 @@ send alerts to topic “my-stream” starting with a certain date and pausing fo
 ```
       docker run -it \
       --network=alertstream_default \
+      --name=$(whoami)_sender \
       -v $PWD:/home/alert_stream/data \
       epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
 ```
@@ -56,6 +57,7 @@ To start a consumer for printing all alerts in the stream "my-stream" to screen:
 ```
 $ docker run -it \
       --network=alertstream_default \
+      --name=$(whoami)_printer \
       epyc_alerts python bin/printStream.py my-stream
 ```
 
@@ -68,6 +70,7 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 ```
 $ docker run -it \
       --network=alertstream_default \
+      --name=$(whoami)_printer \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
       epyc_alerts python bin/printStream.py my-stream --stampDir stamps
 ```
