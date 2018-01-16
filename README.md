@@ -45,6 +45,7 @@ send alerts from that visit to topic “my-stream”:
 ```
       docker run -it \
       --network=alertstream_default \
+      --name=$(whoami)_sender \
       -v $PWD:/home/alert_stream/data \
       sims_alerts python bin/sendAlertStream.py my-stream alerts_11575.avro
 ```
@@ -56,6 +57,7 @@ To start a consumer for printing all alerts in the stream "my-stream" to screen:
 ```
 $ docker run -it \
       --network=alertstream_default \
+      --name=$(whoami)_printer \
       sims_alerts python bin/printStream.py my-stream
 ```
 
@@ -70,6 +72,7 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 ```
 $ docker run -it \
       --network=alertstream_default \
+      --name=$(whoami)_printer \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
       sims_alerts python bin/printStream.py my-stream --stampDir stamps
 ```
