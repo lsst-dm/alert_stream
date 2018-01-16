@@ -21,6 +21,14 @@ $ docker-compose up -d
 
 This will create a network named `alertstream_default`, or something similar, with the default driver over which the other containers will connect and will start Kafka and Zookeeper.
 
+Note: To start your OWN broker (non-shared on epyc) from which to send and read a stream, you will
+need to do two things.
+
+1. In the docker-compose.yml file, change the service names of "kafka" and "zookeeper" to something like
+"maria-kafka" and "maria-zookeeper."
+2. In the Python files for sending and receiving the stream, change the configuration of Kafka
+bootstrap.servers from "kafka:9092" to "maria-kafka:9092."
+
 **Build docker container**
 
 From the alert_stream directory:
@@ -28,6 +36,15 @@ From the alert_stream directory:
 ```
 $ docker build -t "sims_alerts" .
 ```
+
+Note: To build your OWN image (non-shared on epyc), which you need to do whenever you make
+changes to the code, you will need to name your image something else, for example, with
+
+```
+$ docker build -t "maria-sims" .
+```
+
+and refer to it in subsequent run commands below for starting containers.
 
 This should now work:
 
