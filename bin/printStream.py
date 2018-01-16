@@ -44,12 +44,14 @@ def alert_filter(alert, stampdir):
     """Filter to apply to each alert.
        See schemas here: https://github.com/lsst-dm/sample-avro-alert
     """
-    print(msg_text(alert))  # Print main alert data to screen
-    if stampdir:  # Collect all postage stamps **There are no stamps**
-        write_stamp_file(
-            alert.get('cutoutDifference'), stampdir)
-        write_stamp_file(
-            alert.get('cutoutTemplate'), stampdir)
+    data = msg_text(alert)
+    if data:  # Write your condition statement here
+        print(data)  # Print main alert data to screen
+        if stampdir:  # Collect all postage stamps **There are no stamps**
+            write_stamp_file(
+                alert.get('cutoutDifference'), stampdir)
+            write_stamp_file(
+                alert.get('cutoutTemplate'), stampdir)
     return
 
 
