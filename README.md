@@ -32,7 +32,7 @@ $ docker build -t "epyc_alerts" .
 This should now work:
 
 ```
-$ docker run -it epyc_alerts python bin/sendAlertStream.py -h
+$ docker run -it --rm epyc_alerts python bin/sendAlertStream.py -h
 ```
 
 You must rebuild your container every time you modify any of the code.
@@ -43,7 +43,7 @@ From the directory containing dates of data (20171227, etc.),
 send alerts to topic “my-stream” starting with a certain date and pausing for 5 seconds between visits:
 
 ```
-      docker run -it \
+      docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
       -v $PWD:/home/alert_stream/data \
@@ -55,7 +55,7 @@ send alerts to topic “my-stream” starting with a certain date and pausing fo
 To start a consumer for printing all alerts in the stream "my-stream" to screen:
 
 ```
-$ docker run -it \
+$ docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_printer \
       epyc_alerts python bin/printStream.py my-stream
@@ -68,7 +68,7 @@ If run using a Docker container, the stamps and other files written out will be 
 To collect postage stamp cutouts and output files locally, you can mount a local directory and give the Docker container write access with, e.g., the following command:
 
 ```
-$ docker run -it \
+$ docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_printer \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
