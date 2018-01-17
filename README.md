@@ -29,7 +29,7 @@ need to do two things.
 2. In the Python files for sending and receiving the stream, change the configuration of Kafka
 bootstrap.servers from "kafka:9092" to "maria-kafka:9092."
 
-**Build docker container**
+**Build docker image**
 
 From the alert_stream directory:
 
@@ -52,7 +52,7 @@ This should now work:
 $ docker run -it --rm sims_alerts python bin/sendAlertStream.py -h
 ```
 
-You must rebuild your container every time you modify any of the code.
+You must rebuild your image every time you modify any of the code.
 
 **Start producing an alert stream**
 
