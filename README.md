@@ -78,6 +78,17 @@ $ docker run -it --rm \
       sims_alerts python bin/printStream.py my-stream
 ```
 
+A template filter, which filters for objects with SNR > 5 and brighter than magnitude 18, is included in
+bin/filterStream.py.  This filter outputs three fields for matching sources: alertId, ra, and dec.
+Output can then be piped to a file as a csv.
+
+```
+$ docker run -it --rm \
+      --network=alertstream_default \
+      --name=$(whoami)_filter \
+      sims_alerts python bin/filterStream.py my-stream > my-sources.csv
+```
+
 There currently no stamps in the simulated data.  When we have stamps, the
 instruction below apply.
 By default, `printStream.py` will not collect postage stamp cutouts.
