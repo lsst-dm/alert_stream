@@ -40,7 +40,7 @@ def write_stamp_file(stamp_dict, output_dir):
     return
 
 
-def alert_filter(alert, stampdir):
+def alert_filter(alert, stampdir=None):
     """Filter to apply to each alert.
        See schemas: https://github.com/ZwickyTransientFacility/ztf-avro-alert
     """
