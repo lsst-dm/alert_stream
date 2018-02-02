@@ -25,7 +25,7 @@ def main():
     args = parser.parse_args()
 
     # Configure producer connection to Kafka broker
-    conf = {'bootstrap.servers': 'kafka:9092'}
+    conf = {'bootstrap.servers': 'production-kafka:9092'}
     streamProducer = alertProducer.AlertProducer(
                         args.topic, **conf)
 

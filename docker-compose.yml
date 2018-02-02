@@ -1,7 +1,7 @@
-version: '3.1'
+version: '3.2'
 
 services:
-  zookeeper:
+  production-zookeeper:
     image: confluentinc/cp-zookeeper:3.2.0
     environment:
       - ZOOKEEPER_CLIENT_PORT=32181
@@ -9,13 +9,13 @@ services:
     ports:
         - "32181:32181"
 
-  kafka:
+  production-kafka:
     image: confluentinc/cp-kafka:3.2.0
     depends_on:
-      - zookeeper
+      - production-zookeeper
     environment:
       - KAFKA_BROKER_ID=1
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_ZOOKEEPER_CONNECT=production-zookeeper:32181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://production-kafka:9092
     ports:
       - "9092:9092"
