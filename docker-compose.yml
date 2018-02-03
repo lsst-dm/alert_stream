@@ -16,6 +16,6 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=production-zookeeper:32181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://production-kafka:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://epyc.astro.washington.edu:9092
     ports:
       - "9092:9092"
