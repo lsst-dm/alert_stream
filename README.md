@@ -1,7 +1,7 @@
 alert_stream
 ============
 
-Mock Kafka alert stream system Kafka for ZTF data for use specifically on epyc machine.
+Code to access the ZTF alert stream on epyc remotely. 
 
 Requires Docker and Docker Compose for the usage instructions below.
 
@@ -15,67 +15,37 @@ Clone repo, cd into directory, and checkout appropriate branch.
 From the alert_stream directory:
 
 ```
-$ git checkout u/mtpatter/ztf-epyc
+$ git checkout u/ebellm/remote-listener
 $ docker-compose up -d
 ```
 
 This will create a network named `alertstream_default`, or something similar, with the default driver over which the other containers will connect and will start Kafka and Zookeeper.
-
-Note: To start your OWN broker (non-shared on epyc) from which to send and read a stream, you will
-need to do two things.
-
-1. In the docker-compose.yml file, change the service names of "kafka" and "zookeeper" to something like
-"maria-kafka" and "maria-zookeeper."
-2. In the Python files for sending and receiving the stream, change the configuration of Kafka
-bootstrap.servers from "kafka:9092" to "maria-kafka:9092."
 
 **Build docker image**
 
 From the alert_stream directory:
 
 ```
-$ docker build -t "epyc_alerts" .
+$ docker build -t "ztf-listener" .
 ```
-
-Note: To build your OWN image (non-shared on epyc), which you need to do whenever you make
-changes to the code, you will need to name your image something else, for example, with
-
-```
-$ docker build -t "maria-ztf" .
-```
-
-and refer to it in subsequent run commands below for starting containers.
 
 This should now work:
 
 ```
-$ docker run -it --rm epyc_alerts python bin/sendAlertStream.py -h
+$ docker run -it --rm ztf-listener python bin/printAlertStream.py -h
 ```
 
 You must rebuild your image every time you modify any of the code.
 
-**Start producing an alert stream**
-
-From the directory containing dates of data (20171227, etc.),
-send alerts to topic “my-stream” starting with a certain date and pausing for 5 seconds between visits:
-
-```
-      docker run -it --rm \
-      --network=alertstream_default \
-      --name=$(whoami)_sender \
-      -v $PWD:/home/alert_stream/data \
-      epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
-```
-
 **Consume alert stream**
 
-To start a consumer for printing all alerts in the stream "my-stream" to screen:
+To start a consumer for printing all alerts in the stream "test-stream" to screen:
 
 ```
 $ docker run -it --rm \
-      --network=alertstream_default \
+      --network=host \
       --name=$(whoami)_printer \
-      epyc_alerts python bin/printStream.py my-stream
+      ztf-listener python bin/printStream.py test-stream
 ```
 
 By default, `printStream.py` will not collect postage stamp cutouts.
@@ -86,10 +56,10 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 
 ```
 $ docker run -it --rm \
-      --network=alertstream_default \
+      --network=host \
       --name=$(whoami)_printer \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
-      epyc_alerts python bin/printStream.py my-stream --stampDir stamps
+      ztf-listener python bin/printStream.py test-stream --stampDir stamps
 ```
 
 Be careful not to write your output to the main shared data directory.
@@ -102,6 +72,6 @@ Shutdown Kafka broker system by running the following from the alert_stream dire
 $ docker-compose down
 ```
 
-Find your epyc_alerts containers with `docker ps` and shut down with `docker kill [id]`.
+Find your containers with `docker ps` and shut down with `docker kill [id]`.
 Running `docker ps` will list existing running containers and can show you if someone
 is already running alert streams before you try starting your own (which may not work).
