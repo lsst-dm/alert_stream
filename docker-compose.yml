@@ -7,7 +7,7 @@ services:
       - ZOOKEEPER_CLIENT_PORT=32181
       - ZOOKEEPER_TICK_TIME=2000
     ports:
-        - "32181:32181"
+        - "32181"
 
   kafka:
     image: confluentinc/cp-kafka:3.2.0
@@ -21,4 +21,4 @@ services:
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
     ports:
-      - "9092:9092"
+      - "9092"
