@@ -13,6 +13,9 @@ services:
     image: confluentinc/cp-kafka:3.2.0
     depends_on:
       - zookeeper
+    #volumes:  # only maria does this in production
+    #  - /data/scratch/kafka/ztf-logs:/logs
+    #  - /data/scratch/kafka/ztf-data:/var/lib/kafka/data    
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
