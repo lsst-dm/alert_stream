@@ -38,8 +38,10 @@ class AlertProducer(object):
             avro_bytes = avroUtils.writeAvroData(data, self.alert_schema)
             raw_bytes = avro_bytes.getvalue()
             self.producer.produce(self.topic, raw_bytes)
+            self.producer.poll(0)
         else:
             self.producer.produce(self.topic, str(data))
+            self.producer.poll(0)
 
     def flush(self):
         return self.producer.flush()
