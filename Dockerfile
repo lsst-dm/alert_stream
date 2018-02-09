@@ -5,7 +5,7 @@ ENV REFRESHED_AT 2018-01-04
 
 # Install library for confluent-kafka python.
 WORKDIR /home
-RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && git checkout tags/v0.9.4
+RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && git checkout tags/v0.11.3
 WORKDIR /home/librdkafka
 RUN ./configure && make && make install
 ENV LD_LIBRARY_PATH /usr/local/lib
