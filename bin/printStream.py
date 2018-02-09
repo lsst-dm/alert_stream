@@ -80,7 +80,7 @@ def main():
     args = parser.parse_args()
 
     # Configure consumer connection to Kafka broker
-    conf = {'bootstrap.servers': 'epyc.astro.washington.edu:9092',
+    conf = {'bootstrap.servers': '128.95.79.19:9092,128.95.79.19:9093,128.95.79.19:9094',
             'default.topic.config': {'auto.offset.reset': 'smallest'}}
     if args.group:
         conf['group.id'] = args.group
