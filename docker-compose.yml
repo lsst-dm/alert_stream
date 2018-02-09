@@ -20,7 +20,7 @@ services:
     ports:
       - "9092:9092"
 
-  kafka:
+  kafka2:
     image: confluentinc/cp-kafka:3.2.0
     depends_on:
       - zookeeper
@@ -31,7 +31,7 @@ services:
     ports:
       - "9093:9093"
 
-  kafka:
+  kafka3:
     image: confluentinc/cp-kafka:3.2.0
     depends_on:
       - zookeeper
