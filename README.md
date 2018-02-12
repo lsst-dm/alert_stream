@@ -62,7 +62,7 @@ Send alerts to topic “my-stream” starting with a certain date, e.g. 20171227
       docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
-      -v /data/scratch/ebellm/ztf_alerts/ztfweb.ipac.caltech.edu:/home/alert_stream/data:ro \
+      -v /data/scratch/ebellm/ztf_alerts/ztfweb.ipac.caltech.edu:/home/data:ro \
       epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
 ```
 

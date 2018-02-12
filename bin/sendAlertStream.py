@@ -30,7 +30,7 @@ def main():
                         args.topic, **conf)
 
     # Scan for avro files
-    root = "./data"
+    root = "../data"
     subdirectories = [d for d in os.listdir(os.path.join(root)) if d >= str(args.startdate)]
     subdirectories.sort()
     for d in subdirectories:
