@@ -38,7 +38,7 @@ def main():
                         args.topic, schema_files, **conf)
 
     # Scan for avro files
-    root = "./data"
+    root = "../data"
     afile = "/".join((root, args.avrofile))
     print('visit:', args.avrofile[7:12])
     # Load template alert contents
