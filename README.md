@@ -63,7 +63,7 @@ send alerts to topic “my-stream” starting with a certain date and pausing fo
       docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
-      -v $PWD:/home/alert_stream/data \
+      -v $PWD:/home/alert_stream/data:ro \
       epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
 ```
 
