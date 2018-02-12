@@ -62,7 +62,7 @@ Send alerts of visit, e.g. 11575, to topic “my-stream”:
       docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
-      -v /data/scratch/mtpatter/avro_171213:/home/alert_stream/data:ro \
+      -v /data/scratch/mtpatter/avro_171213:/home/data:ro \
       sims_alerts python bin/sendAlertStream.py my-stream alerts_11575.avro
 ```
 
