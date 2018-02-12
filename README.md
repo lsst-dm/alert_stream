@@ -56,14 +56,13 @@ You must rebuild your image every time you modify any of the code.
 
 **Start producing an alert stream**
 
-From the directory containing files of data (alerts_11575.avro, etc.),
-send alerts from that visit to topic “my-stream”:
+Send alerts of visit, e.g. 11575, to topic “my-stream”:
 
 ```
       docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
-      -v $PWD:/home/alert_stream/data:ro \
+      -v /data/scratch/mtpatter/avro_171213:/home/alert_stream/data:ro \
       sims_alerts python bin/sendAlertStream.py my-stream alerts_11575.avro
 ```
 
