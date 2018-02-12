@@ -56,14 +56,13 @@ You must rebuild your image every time you modify any of the code.
 
 **Start producing an alert stream**
 
-From the directory containing dates of data (20171227, etc.),
-send alerts to topic “my-stream” starting with a certain date and pausing for 5 seconds between visits:
+Send alerts to topic “my-stream” starting with a certain date, e.g. 20171227 and pausing for 5 seconds between visits:
 
 ```
       docker run -it --rm \
       --network=alertstream_default \
       --name=$(whoami)_sender \
-      -v $PWD:/home/alert_stream/data:ro \
+      -v /data/scratch/ebellm/ztf_alerts/ztfweb.ipac.caltech.edu:/home/alert_stream/data:ro \
       epyc_alerts python bin/sendAlertStream.py my-stream 20171227 5
 ```
 
