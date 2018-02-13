@@ -92,7 +92,8 @@ class AlertConsumer(object):
         message = msg.value()
         try:
             bytes_io = io.BytesIO(message)
-            decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
+            decoded_msg = avroUtils.readSchemaData(bytes_io)
+            #decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
         except AssertionError:
             # FIXME this exception is raised but not sure if it matters yet
             bytes_io = io.BytesIO(message)

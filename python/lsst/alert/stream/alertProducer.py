@@ -40,7 +40,7 @@ class AlertProducer(object):
             self.producer.produce(self.topic, raw_bytes)
             self.producer.poll(0)
         else:
-            self.producer.produce(self.topic, str(data))
+            self.producer.produce(self.topic, data)
             self.producer.poll(0)
 
     def flush(self):
