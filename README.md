@@ -32,7 +32,7 @@ $ docker build -t "ztf-listener" .
 This should now work:
 
 ```
-$ docker run -it --rm ztf-listener python bin/printAlertStream.py -h
+$ docker run -it --rm ztf-listener python bin/printStream.py -h
 ```
 
 You must rebuild your image every time you modify any of the code.
