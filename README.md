@@ -1,7 +1,7 @@
 alert_stream
 ============
 
-Mock Kafka alert stream system Kafka for sims data for use specifically on epyc machine.
+Mock Kafka alert stream system Kafka using sims data.
 
 Requires Docker and Docker Compose for the usage instructions below.
 
@@ -15,33 +15,17 @@ Clone repo, cd into directory, and checkout appropriate branch.
 From the alert_stream directory:
 
 ```
-$ git checkout u/mtpatter/sims-epyc
 $ docker-compose up -d
 ```
 
 This will create a network named `alertstream_default`, or something similar, with the default driver over which the other containers will connect and will start Kafka and Zookeeper.
-
-Note: To start your OWN broker (non-shared on epyc) from which to send and read a stream, you will
-need to do two things.
-
-1. In the docker-compose.yml file, change the service names of "kafka" and "zookeeper" to something like
-"maria-kafka" and "maria-zookeeper."
-2. In the Python files for sending and receiving the stream, change the configuration of Kafka
-bootstrap.servers from "kafka:9092" to "maria-kafka:9092."
 
 **Build docker image**
 
 From the alert_stream directory:
 
 ```
-$ docker build -t "sims_alerts" .
-```
-
-Note: To build your OWN image (non-shared on epyc), which you need to do whenever you make
-changes to the code, you will need to name your image something else, for example, with
-
-```
-$ docker build -t "maria-sims" .
+$ docker build -t "alert_stream" .
 ```
 
 and refer to it in subsequent run commands below for starting containers.
@@ -49,21 +33,20 @@ and refer to it in subsequent run commands below for starting containers.
 This should now work:
 
 ```
-$ docker run -it --rm sims_alerts python bin/sendAlertStream.py -h
+$ docker run -it --rm alert_stream python bin/sendAlertStream.py -h
 ```
 
 You must rebuild your image every time you modify any of the code.
 
 **Start producing an alert stream**
 
-Send alerts of visit, e.g. 11575, to topic “my-stream”:
+Send alerts of visit, e.g. 11577, to topic “my-stream”:
 
 ```
       docker run -it --rm \
       --network=alertstream_default \
-      --name=$(whoami)_sender \
-      -v /data/scratch/mtpatter/avro_171213:/home/data:ro \
-      sims_alerts python bin/sendAlertStream.py my-stream alerts_11575.avro
+      -v $PWD/data:/home/data:ro \
+      alert_stream python bin/sendAlertStream.py my-stream alerts_11577.avro
 ```
 
 **Consume alert stream**
@@ -73,8 +56,7 @@ To start a consumer for printing all alerts in the stream "my-stream" to screen:
 ```
 $ docker run -it --rm \
       --network=alertstream_default \
-      --name=$(whoami)_printer \
-      sims_alerts python bin/printStream.py my-stream
+      alert_stream python bin/printStream.py my-stream
 ```
 
 A template filter, which filters for objects with SNR > 5 and brighter than magnitude 18, is included in
@@ -84,8 +66,7 @@ Output can then be piped to a file as a csv.
 ```
 $ docker run -it --rm \
       --network=alertstream_default \
-      --name=$(whoami)_filter \
-      sims_alerts python bin/filterStream.py my-stream > my-sources.csv
+      alert_stream python bin/filterStream.py my-stream > my-sources.csv
 ```
 
 There currently no stamps in the simulated data.  When we have stamps, the
@@ -99,12 +80,9 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 ```
 $ docker run -it --rm \
       --network=alertstream_default \
-      --name=$(whoami)_printer \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
-      sims_alerts python bin/printStream.py my-stream --stampDir stamps
+      alert_stream python bin/printStream.py my-stream --stampDir stamps
 ```
-
-Be careful not to write your output to the main shared data directory.
 
 **Shut down and clean up**
 
@@ -114,6 +92,4 @@ Shutdown Kafka broker system by running the following from the alert_stream dire
 $ docker-compose down
 ```
 
-Find your sims_alerts containers with `docker ps` and shut down with `docker kill [id]`.
-Running `docker ps` will list existing running containers and can show you if someone
-is already running alert streams before you try starting your own (which may not work).
+Find your alert_stream containers with `docker ps` and shut down with `docker kill [id]`.
