@@ -93,29 +93,28 @@ def main():
                     "../sample-avro-alert/schema/alert.avsc"]
 
     # Start consumer and print alert stream
-    streamReader = alertConsumer.AlertConsumer(
-                        args.topic, schema_files, **conf)
+    with alertConsumer.AlertConsumer(args.topic, schema_files,
+                                     **conf) as streamReader:
+        while True:
+            try:
+                msg = streamReader.poll(decode=args.avroFlag)
 
-    while True:
-        try:
-            msg = streamReader.poll(decode=args.avroFlag)
+                if msg is None:
+                    continue
+                else:
+                    # Apply filter to each alert
+                    alert_filter(msg, args.stampDir)
 
-            if msg is None:
-                continue
-            else:
-                # Apply filter to each alert
-                alert_filter(msg, args.stampDir)
-
-        except alertConsumer.EopError as e:
-            # Write when reaching end of partition
-            sys.stderr.write(e.message)
-        except IndexError:
-            sys.stderr.write('%% Data cannot be decoded\n')
-        except UnicodeDecodeError:
-            sys.stderr.write('%% Unexpected data format received\n')
-        except KeyboardInterrupt:
-            sys.stderr.write('%% Aborted by user\n')
-            sys.exit()
+            except alertConsumer.EopError as e:
+                # Write when reaching end of partition
+                sys.stderr.write(e.message)
+            except IndexError:
+                sys.stderr.write('%% Data cannot be decoded\n')
+            except UnicodeDecodeError:
+                sys.stderr.write('%% Unexpected data format received\n')
+            except KeyboardInterrupt:
+                sys.stderr.write('%% Aborted by user\n')
+                sys.exit()
 
 
 if __name__ == "__main__":
