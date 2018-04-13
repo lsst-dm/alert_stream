@@ -78,3 +78,21 @@ def readAvroData(bytes_io, json_schema):
     bytes_io.seek(0)
     message = fastavro.schemaless_reader(bytes_io, json_schema)
     return message
+
+
+def readSchemaData(bytes_io):
+    """Read data that already has an Avro schema.
+
+    Parameters
+    ----------
+    bytes_io : `_io.BytesIO`
+        Data to be decoded.
+
+    Returns
+    -------
+    `dict`
+        Decoded data.
+    """
+    bytes_io.seek(0)
+    message = fastavro.reader(bytes_io)
+    return message

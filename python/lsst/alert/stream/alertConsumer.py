@@ -48,10 +48,19 @@ class AlertConsumer(object):
     """
 
     def __init__(self, topic, schema_files=None, **kwargs):
-        self.consumer = confluent_kafka.Consumer(**kwargs)
-        self.consumer.subscribe([topic])
+        self.topic = topic
+        self.kafka_kwargs = kwargs
         if schema_files is not None:
             self.alert_schema = avroUtils.combineSchemas(schema_files)
+
+    def __enter__(self):
+        self.consumer = confluent_kafka.Consumer(**self.kafka_kwargs)
+        self.consumer.subscribe([self.topic])
+        return self
+
+    def __exit__(self, type, value, traceback):
+        # FIXME should be properly handling exceptions here, but we aren't
+        self.consumer.close()
 
     def poll(self, decode=False, verbose=True):
         """Polls Kafka broker to consume topic.
@@ -63,17 +72,18 @@ class AlertConsumer(object):
         verbose : `boolean`
             If True, returns every message. If False, only raises EopError.
         """
-        msg = self.consumer.poll()
+        msg = self.consumer.poll(timeout=1)
 
-        if msg.error():
-            raise EopError(msg)
-        else:
-            if verbose is True:
-                if decode is True:
-                    return self.decodeMessage(msg)
-                else:
-                    ast_msg = literal_eval(str(msg.value(), encoding='utf-8'))
-                    return ast_msg
+        if msg:
+            if msg.error():
+                raise EopError(msg)
+            else:
+                if verbose is True:
+                    if decode is True:
+                        return self.decodeMessage(msg)
+                    else:
+                        ast_msg = literal_eval(str(msg.value(), encoding='utf-8'))
+                        return ast_msg
         return
 
     def decodeMessage(self, msg):
@@ -90,10 +100,16 @@ class AlertConsumer(object):
             Decoded message.
         """
         message = msg.value()
-        bytes_io = io.BytesIO(message)
         try:
+            bytes_io = io.BytesIO(message)
+            #decoded_msg = avroUtils.readSchemaData(bytes_io)
             decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
         except AssertionError:
             # FIXME this exception is raised but not sure if it matters yet
+            bytes_io = io.BytesIO(message)
             decoded_msg = None
+        except IndexError:
+            literal_msg = literal_eval(str(message, encoding='utf-8'))  # works to give bytes
+            bytes_io = io.BytesIO(literal_msg)  # works to give <class '_io.BytesIO'>
+            decoded_msg = avroUtils.readSchemaData(bytes_io)  # yields reader
         return decoded_msg

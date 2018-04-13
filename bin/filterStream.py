@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-"""Consumes stream for printing all messages to the console.
+"""Template alert stream filter.
 
-Note that consumers with the same group ID share a stream.
-To run multiple consumers each printing all messages,
-each consumer needs a different group.
+This example filter catches diaSources with SNR > 5 and
+brighter than magnitude 18.
 """
 
 from __future__ import print_function
@@ -45,8 +44,13 @@ def alert_filter(alert, stampdir=None):
        See schemas here: https://github.com/lsst-dm/sample-avro-alert
     """
     data = msg_text(alert)
-    if data:  # Write your condition statement here
-        print(data)  # Print main alert data to screen
+    # Write your condition statement below
+    if ((data['diaSource']['snr'] > 5) &
+       (data['diaSource']['diffFlux'] > 0.0002291)):  # Brighter than mag 18
+        print((','.join((str(x) for x in  # Print fields of interest
+                        [data['alertId'],
+                         data['diaSource']['ra'],
+                         data['diaSource']['decl']]))))
         if stampdir:  # Collect all postage stamps **There are no stamps**
             write_stamp_file(
                 alert.get('cutoutDifference'), stampdir)
@@ -105,9 +109,8 @@ def main():
                     # Apply filter to each alert
                     alert_filter(msg, args.stampDir)
 
-            except alertConsumer.EopError as e:
-                # Write when reaching end of partition
-                sys.stderr.write(e.message)
+            except alertConsumer.EopError:
+                continue
             except IndexError:
                 sys.stderr.write('%% Data cannot be decoded\n')
             except UnicodeDecodeError:

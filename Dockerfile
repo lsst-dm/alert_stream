@@ -1,7 +1,7 @@
 # Version: 0.0.3
 FROM python:3.6
 LABEL maintainer "maria.t.patterson@gmail.com"
-ENV REFRESHED_AT 2017-03-14
+ENV REFRESHED_AT 2018-01-08
 
 # Install library for confluent-kafka python.
 WORKDIR /home
