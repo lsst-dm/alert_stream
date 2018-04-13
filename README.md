@@ -5,6 +5,14 @@ Mock Kafka alert stream system Kafka using sims data.
 
 Requires Docker and Docker Compose for the usage instructions below.
 
+Git LFS
+-------
+
+To clone and use this repository, you'll need Git Large File Storage (LFS).
+
+Our [Developer Guide](https://developer.lsst.io/tools/git_lfs.html)
+explains how to set up Git LFS for LSST development.
+
 Usage (single host)
 -------------------
 
