@@ -1,17 +1,10 @@
-# Version: 0.0.3
+# Version: DM-14704
 FROM python:3.6
 LABEL maintainer "maria.t.patterson@gmail.com"
-ENV REFRESHED_AT 2018-01-08
-
-# Install library for confluent-kafka python.
-WORKDIR /home
-RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && git checkout tags/v0.9.4
-WORKDIR /home/librdkafka
-RUN ./configure && make && make install
-ENV LD_LIBRARY_PATH /usr/local/lib
+ENV REFRESHED_AT 2018-06-07
 
 # Pip installs.
-RUN pip install confluent-kafka
+RUN pip install 'confluent-kafka>=0.11.4'
 RUN pip install avro-python3
 RUN pip install Cython
 RUN pip install fastavro
