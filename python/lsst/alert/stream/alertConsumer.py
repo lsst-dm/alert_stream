@@ -74,7 +74,7 @@ class AlertConsumer(object):
         """
         msg = self.consumer.poll(timeout=1)
 
-        if msg:
+        if msg is not None:
             if msg.error():
                 raise EopError(msg)
             else:
