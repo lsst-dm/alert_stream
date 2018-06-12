@@ -68,7 +68,7 @@ def main():
                         args.topic, schema_files, **conf)
 
     # Scan for avro files
-    root = "../data"
+    root = "./data"
     files = [f for f in glob.glob("/".join([root, "*.avro"]))]
     files.sort()
 
