@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.14.0 (fa706f2)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: filterer4
+  name: filterer4
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: filterer4
+    spec:
+      containers:
+      - args:
+        - python
+        - bin/filterStream.py
+        - full-stream
+        - "61"
+        - "80"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        image: alert_stream
+        name: filterer4
+        resources: {}
+      restartPolicy: Always
+status: {}

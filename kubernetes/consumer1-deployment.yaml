@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.14.0 (fa706f2)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: consumer1
+  name: consumer1
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: consumer1
+    spec:
+      containers:
+      - args:
+        - python
+        - bin/printStream.py
+        - Filter001
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        image: alert_stream
+        name: consumer1
+        resources: {}
+      restartPolicy: Always
+status: {}
