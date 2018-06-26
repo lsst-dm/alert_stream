@@ -29,5 +29,12 @@ spec:
         image: alert_stream
         name: sender
         resources: {}
+        volumeMounts:
+        - mountPath: /home/alert_stream/data
+          name: alert-data
       restartPolicy: Always
+      volumes:
+      - name: alert-data
+        persistentVolumeClaim:
+          claimName: alert-data
 status: {}

@@ -24,10 +24,11 @@ spec:
       containers:
       - env:
         - name: KAFKA_ADVERTISED_LISTENERS
-          #value: PLAINTEXT://kafka:9092
+          value: PLAINTEXT://kafka:9092
+          #value: PLAINTEXT://:9092
           #value: PLAINTEXT://kafka.alerts-lsst.svc.cluster.local:9092
           #value: PLAINTEXT://141.142.181.185:9092
-          value: PLAINTEXT://10.101.235.141:9092
+          #value: PLAINTEXT://10.101.235.141:9092
         - name: KAFKA_BROKER_ID
           value: "1"
         - name: KAFKA_DELETE_TOPIC_ENABLE
@@ -35,11 +36,17 @@ spec:
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "1"
         - name: KAFKA_ZOOKEEPER_CONNECT
-          value: zookeeper:32181
+          #value: zookeeper:32181
+          value: "$(ZOOKEEPER_SERVICE_HOST):$(ZOOKEEPER_SERVICE_PORT)"
         image: confluentinc/cp-kafka:4.1.1
         name: kafka
         ports:
         - containerPort: 9092
         resources: {}
+        #command:
+        #- /usr/bin/kafka-server-start
+        #- /etc/kafka/server.properties
+        #- --override 
+        #- zookeeper.connect=zookeeper:32181
       restartPolicy: Always
 status: {}
