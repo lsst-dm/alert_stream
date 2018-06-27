@@ -21,6 +21,7 @@ spec:
       - args:
         - python
         - bin/filterStream.py
+        - kafka.alerts-lsst.svc.cluster.local:9092
         - full-stream
         - "21"
         - "40"

@@ -21,6 +21,7 @@ spec:
       - args:
         - python
         - bin/printStream.py
+        - kafka.alerts-lsst.svc.cluster.local:9092
         - Filter081
         env:
         - name: PYTHONUNBUFFERED
