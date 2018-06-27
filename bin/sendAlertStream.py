@@ -51,6 +51,8 @@ def schedule_delays(eventloop, function, argslist, interval=39):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('broker', type=str,
+                        help='Hostname or IP and port of Kafka broker.')
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic stream to push to.')
     args = parser.parse_args()
@@ -63,7 +65,7 @@ def main():
                     "../sample-avro-alert/schema/alert.avsc"]
 
     # Configure producer connection to Kafka broker
-    conf = {'bootstrap.servers': 'kafka:9092'}
+    conf = {'bootstrap.servers': args.broker}
     streamProducer = alertProducer.AlertProducer(
                         args.topic, schema_files, **conf)
 
