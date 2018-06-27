@@ -27,7 +27,7 @@ spec:
         env:
         - name: PYTHONUNBUFFERED
           value: "0"
-        image: alert_stream
+        image: mtpatter/sims-dev
         name: sender
         resources: {}
       restartPolicy: Always
