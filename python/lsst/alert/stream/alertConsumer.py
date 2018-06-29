@@ -72,7 +72,7 @@ class AlertConsumer(object):
         verbose : `boolean`
             If True, returns every message. If False, only raises EopError.
         """
-        msg = self.consumer.poll(timeout=1)
+        msg = self.consumer.poll(timeout=1e-3)
 
         if msg is not None:
             if msg.error():
