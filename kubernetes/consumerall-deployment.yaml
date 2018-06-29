@@ -6,8 +6,8 @@ metadata:
     kompose.version: 1.14.0 (fa706f2)
   creationTimestamp: null
   labels:
-    io.kompose.service: consumer5
-  name: consumer5
+    io.kompose.service: consumer1
+  name: consumer1
 spec:
   replicas: 1
   strategy: {}
@@ -15,20 +15,20 @@ spec:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: consumer5
+        io.kompose.service: consumer1
     spec:
       containers:
       - args:
         - python
         - bin/printStream.py
         - kafka.alerts-lsst.svc.cluster.local:9092
-        - Filter041
-        - 1
+        - full-stream
+        - 100
         env:
         - name: PYTHONUNBUFFERED
           value: "0"
         image: lsst-kub001:5000/alert_stream
-        name: consumer5
+        name: consumer1
         resources: {}
       restartPolicy: Always
 status: {}

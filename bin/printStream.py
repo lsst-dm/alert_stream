@@ -61,6 +61,8 @@ def main():
                         help='Hostname or IP and port of Kafka broker.')
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic to listen to.')
+    parser.add_argument('interval', type=int,
+                        help='Print every Nth alert.')
     parser.add_argument('--group', type=str,
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
@@ -97,6 +99,7 @@ def main():
     # Start consumer and print alert stream
     with alertConsumer.AlertConsumer(args.topic, schema_files,
                                      **conf) as streamReader:
+        msg_count = 0
         while True:
             try:
                 msg = streamReader.poll(decode=args.avroFlag)
@@ -104,8 +107,10 @@ def main():
                 if msg is None:
                     continue
                 else:
-                    # Apply filter to each alert
-                    alert_filter(msg, args.stampDir)
+                    msg_count += 1
+                    if msg_count % args.interval == 0:
+                        # Apply filter to each alert
+                        alert_filter(msg, args.stampDir)
 
             except alertConsumer.EopError as e:
                 # Write when reaching end of partition
