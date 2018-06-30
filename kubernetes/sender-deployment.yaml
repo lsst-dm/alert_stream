@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.14.0 (fa706f2)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sender
+  name: sender
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: sender
+    spec:
+      containers:
+      - args:
+        - python
+        - bin/sendAlertStream.py
+        - kafka.alerts-lsst.svc.cluster.local:9092
+        - full-stream
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        image: lsst-kub001:5000/alert_stream
+        name: sender
+        resources: {}
+      restartPolicy: Always
+status: {}

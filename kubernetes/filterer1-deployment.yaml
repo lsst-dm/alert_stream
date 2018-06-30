@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.14.0 (fa706f2)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: filterer1
+  name: filterer1
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: filterer1
+    spec:
+      containers:
+      - args:
+        - python
+        - bin/filterStream.py
+        - kafka.alerts-lsst.svc.cluster.local:9092
+        - full-stream
+        - "1"
+        - "20"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        image: lsst-kub001:5000/alert_stream
+        name: filterer1
+        resources: {}
+      restartPolicy: Always
+status: {}

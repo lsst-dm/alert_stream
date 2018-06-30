@@ -1,0 +1,156 @@
+version: '3.1'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:4.1.1
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=32181
+      - ZOOKEEPER_TICK_TIME=2000
+    ports:
+        - "32181"
+
+  kafka:
+    image: confluentinc/cp-kafka:4.1.1
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1  # remove for >= 3 brokers
+      - KAFKA_DELETE_TOPIC_ENABLE=true
+    ports:
+      - "9092"
+
+  consumer1:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter001
+
+  consumer2:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter011
+
+  consumer3:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter021
+
+  consumer4:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter031
+
+  consumer5:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter041
+
+  consumer6:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter051
+
+  consumer7:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter061
+
+  consumer8:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter071
+
+  consumer9:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter081
+
+  consumer10:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/printStream.py Filter091
+
+  filterer1:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/filterStream.py full-stream 1 20
+
+  filterer2:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/filterStream.py full-stream 21 40
+
+  filterer3:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/filterStream.py full-stream 41 60
+
+  filterer4:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/filterStream.py full-stream 61 80
+
+  filterer5:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    command: python bin/filterStream.py full-stream 81 100
+
+  sender:
+    image: alert_stream
+    depends_on:
+      - kafka
+    environment:
+      - PYTHONUNBUFFERED=0
+    volumes:
+      - alert_data:/home/alert_stream/data
+    command: python bin/sendAlertStream.py full-stream
+    #deploy:
+    #  placement:
+    #    constraints: [node.role == manager]

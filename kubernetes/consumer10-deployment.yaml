@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.14.0 (fa706f2)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: consumer10
+  name: consumer10
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: consumer10
+    spec:
+      containers:
+      - args:
+        - python
+        - bin/printStream.py
+        - kafka.alerts-lsst.svc.cluster.local:9092
+        - Filter091
+        - 1
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "0"
+        image: lsst-kub001:5000/alert_stream
+        name: consumer10
+        resources: {}
+      restartPolicy: Always
+status: {}

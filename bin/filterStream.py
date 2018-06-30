@@ -20,6 +20,8 @@ from lsst.alert.stream import filters as fl
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('broker', type=str,
+                        help='Hostname or IP and port of Kafka broker.')
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic to listen to.')
     parser.add_argument('firstFilter', type=int,
@@ -53,14 +55,14 @@ def main():
                     "../sample-avro-alert/schema/alert.avsc"]
 
     # Configure consumer connection to Kafka broker
-    cconf = {'bootstrap.servers': 'kafka:9092',
+    cconf = {'bootstrap.servers': args.broker,
              'default.topic.config': {'auto.offset.reset': 'smallest'}}
     if args.group:
         cconf['group.id'] = args.group
     else:
         cconf['group.id'] = os.environ['HOSTNAME']
 
-    pconf = {'bootstrap.servers': 'kafka:9092'}
+    pconf = {'bootstrap.servers': args.broker}
 
     # Get all filter classes from filters module
     filter_list = [c[1] for c in

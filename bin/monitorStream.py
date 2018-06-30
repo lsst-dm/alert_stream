@@ -15,6 +15,8 @@ from lsst.alert.stream import alertConsumer
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('broker', type=str,
+                        help='Hostname or IP and port of Kafka broker.')
     parser.add_argument('topic', type=str,
                         help='Name of Kafka topic to listen to.')
     parser.add_argument('--group', type=str,
@@ -25,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     # Configure consumer connection to Kafka broker
-    conf = {'bootstrap.servers': 'kafka:9092',
+    conf = {'bootstrap.servers': args.broker,
             'default.topic.config': {'auto.offset.reset': 'smallest'}}
     if args.group:
         conf['group.id'] = args.group
