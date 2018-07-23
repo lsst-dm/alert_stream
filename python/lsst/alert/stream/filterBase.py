@@ -4,18 +4,20 @@ __all__ = ['AlertFilter', 'Exporter', 'StreamExporter']
 
 class AlertFilter(object):
 
-    def __init__(self, topic):
-        self.topic = topic
+    def __init__(self, outputStream):
+        self.outputStream = outputStream
+        self.visitId = 'visitId'
 
     def __call__(self, alert):
-        self.visit = self.getVisit(alert)
-        if self.filter(alert):
-            return True
-        else:
-            return False
+        visit = self.getVisit(alert)
+        if visit != self.visitId:
+            self.alertCount = 1
+            self.visitId = visit
+        if self.filter(alert) and self.alertCount <= 20:
+            self.alertCount += 1
+            self.outputStream(alert)
 
-    @staticmethod
-    def getVisit(alert):
+    def getVisit(self, alert):
         ccdVisitId = alert['diaSource']['ccdVisitId']
         # TODO Visit ID scraping will depend on format of ccdVisitId
         visit = str(ccdVisitId)[-5:]
