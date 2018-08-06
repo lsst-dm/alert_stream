@@ -67,7 +67,7 @@ Template filters, which filters for objects with SNR > 5 and brighter than magni
 20, are included in filters.py.  These filters output to a new stream with the
 name of the filter class.
 
-The following will run filter 1, producing a filtered streams named
+The following will run filter 1, producing a filtered stream named
 "Filter001":
 
 ```
