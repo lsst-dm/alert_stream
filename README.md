@@ -67,13 +67,13 @@ Template filters, which filters for objects with SNR > 5 and brighter than magni
 20, are included in filters.py.  These filters output to a new stream with the
 name of the filter class.
 
-The following will run filters 1 to 5, producing filtered streams named
-"Filter001"..."Filter005":
+The following will run filter 1, producing a filtered streams named
+"Filter001":
 
 ```
 $ docker run -it --rm \
       --network=alertstream_default \
-      alert_stream python bin/filterStream.py kafka:9092 my-stream 1 5
+      alert_stream python bin/filterStream.py kafka:9092 my-stream 1
 ```
 
 **Consume alert stream**
