@@ -119,3 +119,10 @@ $ docker-compose down
 ```
 
 Find your alert_stream containers with `docker ps` and shut down with `docker kill [id]`.
+
+
+Usage (multiple hosts)
+----------------------
+
+For running on a Docker Swarm with multiple hosts and deploying a full
+mini-broker prototype, see the README and scripts in the swarm directory.

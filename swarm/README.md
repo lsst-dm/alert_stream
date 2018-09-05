@@ -37,7 +37,7 @@ Performance
 
 This design has the advantage of being able to run 100 filters without
 each filter having to read its own full copy of the stream over a network.
-With groups of 20 filters on five Kafka mirror nodes, the network 
+With groups of 20 filters on five Kafka mirror nodes, the network
 needs only to support enough bandwidth for the alert producer to the
 main Kafka hub and five full streams feeding each of the mirror nodes.
 Each Kafka mirror node receives one copy of the full stream and acts
@@ -58,6 +58,24 @@ The following describes timing performance for a simulation with 18 visits:
 * Max time for the alert producer to serialize one visit of 10,000 alerts and finish sending to Kafka - 15.76 seconds
 * Mean time from the alert producer finishing sending the last alert of a visit to Kafka to a filterer finishing processing all alerts in a visit - 0.25 seconds
 * Mean time from the alert producer starting to send alerts to the 20th filtered alert to be received by an end consumer - 5.28 seconds
+
+The above timing numbers are for 20 filters per node, which is the default
+for the included scripts.
+Up to 50 filters have been successfully deployed per node on AWS m4.4xlarge
+ec2 instances for a total of 250 simultaneous filters.
+
+For the same experiments with 50 filters per node, the following describes the
+timing performance:
+
+* Time for the alert producer to serialize one visit of 10,000 alerts and finish
+sending to Kafka - 16.4 seconds mean, 16.5 seconds max
+* Time between the alert producer starting to send a visit of alerts and the last
+filtered alert (20th) being received by a consumer - 16.5 seconds mean,
+38.7 seconds max
+* Time between the alert producer starting to send a visit of alerts and a filter
+finishing processing of the whole visit - 25.7 seconds mean, 31.7 seconds max
+* Time between the alert producer finishing sending all alerts and a filter
+finishing processing all alerts - 1.7 seconds mean, 15.4 seconds max
 
 Compared with the prototype of the alert distribution without filters described
 in DMTN-028, there is no noticeable effect on / slowing of the system's
