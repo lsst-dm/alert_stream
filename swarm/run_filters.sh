@@ -15,7 +15,7 @@ for i in `seq $3 $4`
         --name filter$filnum \
         --network alert_stream_default \
         --constraint node.id==$1 \
-	      --endpoint-mode=dnsrr \
+	--endpoint-mode=dnsrr \
         -e PYTHONUNBUFFERED=0 \
-        mtpatter/sims-dev python bin/filterStream.py $2 full-stream $num
+        alert_stream python bin/filterStream.py $2 full-stream $num
     done
