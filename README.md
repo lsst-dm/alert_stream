@@ -26,7 +26,9 @@ From the alert_stream directory:
 $ docker-compose up -d
 ```
 
-This will create a network named `alertstream_default`, or something similar, with the default driver over which the other containers will connect and will start Kafka and Zookeeper.
+This will create a network named `alertstream_default`, or something similar
+(`alert_stream_default` with some versions of Docker), with the default driver
+over which the other containers will connect and will start Kafka and Zookeeper.
 
 **Build docker image**
 
