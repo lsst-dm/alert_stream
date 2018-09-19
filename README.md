@@ -26,8 +26,7 @@ From the alert_stream directory:
 $ docker-compose up -d
 ```
 
-This will create a network named `alertstream_default`, or something similar
-(`alert_stream_default` with some versions of Docker), with the default driver
+This will create a network named `alert_stream_default` with the default driver
 over which the other containers will connect and will start Kafka and Zookeeper.
 
 **Build docker image**
@@ -58,7 +57,7 @@ Send bursts of alerts at expected visit intervals to topic “my-stream”:
 
 ```
       docker run -it --rm \
-      --network=alertstream_default \
+      --network=alert_stream_default \
       -v $PWD/data:/home/alert_stream/data:ro \
       alert_stream python bin/sendAlertStream.py kafka:9092 my-stream
 ```
@@ -74,7 +73,7 @@ The following will run filter 1, producing a filtered stream named
 
 ```
 $ docker run -it --rm \
-      --network=alertstream_default \
+      --network=alert_stream_default \
       alert_stream python bin/filterStream.py kafka:9092 my-stream 1
 ```
 
@@ -84,7 +83,7 @@ To start a consumer for printing all alerts in the stream "Filter001" to screen:
 
 ```
 $ docker run -it --rm \
-      --network=alertstream_default \
+      --network=alert_stream_default \
       alert_stream python bin/printStream.py kafka:9092 Filter001
 ```
 
@@ -93,7 +92,7 @@ of stream "Filter001":
 
 ```
 $ docker run -it --rm \
-      --network=alertstream_default \
+      --network=alert_stream_default \
       alert_stream python bin/monitorStream.py kafka:9092 Filter001
 ```
 
@@ -107,7 +106,7 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 
 ```
 $ docker run -it --rm \
-      --network=alertstream_default \
+      --network=alert_stream_default \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
       alert_stream python bin/printStream.py kafka:9092 Filter001 --stampDir stamps
 ```
