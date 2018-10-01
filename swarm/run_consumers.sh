@@ -16,5 +16,5 @@ for i in `seq  $3 $4`
         --constraint node.id==$1 \
         --endpoint-mode=dnsrr \
         -e PYTHONUNBUFFERED=0 \
-        alert_stream python bin/monitorStream.py $2 Filter$filnum
+        mtpatter/sims-dev python bin/monitorStream.py $2 Filter$filnum
     done

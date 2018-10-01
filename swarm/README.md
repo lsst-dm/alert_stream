@@ -7,7 +7,7 @@ Overview
 These are Swarm deployment scripts for a version of the
 mini-broker running a one-container-per-filter setup.
 This design is updated from the design described in DMTN-081
-[https://dmtn-028.lsst.io](https://dmtn-028.lsst.io), which
+[https://dmtn-081.lsst.io](https://dmtn-081.lsst.io), which
 runs multiple filters in the same container.
 To deploy a prototype of the full mini-broker with 100 consumers
 (end users) and 100 individual filters each in their own container,
@@ -161,9 +161,12 @@ included in the alert_stream image.
 For example, to run only Filter001-Filter040, only list two nodes
 in the `filternodes.txt` and `consumernodes.txt` files.
 The Kafka and Zookeeper Docker images come from the Docker Hub
-organization 'confluentinc', and the MirrorMaker Docker image comes from the
-organization 'mtpatter'.
-The rest of the components use the alert_stream image.
+organization 'confluentinc' and the MirrorMaker and alert_stream
+Docker images currently come from the organization 'mtpatter', under the repos
+`mirrormaker` and `sims-dev`.
+In order to use the alert_stream image built locally from the Dockerfile included
+here instead of Docker Hub, a private registry must be set up so that
+all nodes of the Swarm are able to access the Docker image.
 See the `deploy_all.sh` and other scripts for details on how the components
 are created.  
 

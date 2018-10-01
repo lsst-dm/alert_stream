@@ -8,4 +8,4 @@ docker service create \
               --constraint node.id==$1 \
               --endpoint-mode=dnsrr \
               -e PYTHONUNBUFFERED=0 \
-              alert_stream python bin/sendAlertStream.py kafka:9092 full-stream
+              mtpatter/sims-dev python bin/sendAlertStream.py kafka:9092 full-stream
