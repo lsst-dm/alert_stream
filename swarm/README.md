@@ -1,10 +1,13 @@
 Mini-broker Swarm deployment for isolated containerized filters
---------------------------------------------------------------
+===============================================================
+
+Overview
+--------
 
 These are Swarm deployment scripts for a version of the
 mini-broker running a one-container-per-filter setup.
 This design is updated from the design described in DMTN-081
-[https://dmtn-028.lsst.io](https://dmtn-028.lsst.io), which
+[https://dmtn-081.lsst.io](https://dmtn-081.lsst.io), which
 runs multiple filters in the same container.
 To deploy a prototype of the full mini-broker with 100 consumers
 (end users) and 100 individual filters each in their own container,
@@ -95,3 +98,99 @@ parallel significantly decreases this time but was not tested here.
 Also note that here the end consumers receive the last (20th) selected alert
 before the alert producer finishes sending the last alert in a visit.
 This is because many alerts are selected by the filters used here.
+
+Deployment instructions for AWS
+-------------------------------
+
+A full mini-broker can be deployed on any Swarm or on AWS
+using AWS's CloudFormation service.
+A template for a Docker for AWS CloudFormation deployment is included here
+in the file Docker.tmpl.
+To deploy a Docker for AWS stack, navigate to the CloudFormation service page,
+go to "Create new stack,"
+and upload the Docker template or instead navigate directly to [https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=Docker&templateURL=https://editions-us-east-1.s3.amazonaws.com/aws/stable/Docker.tmpl](https://console.aws.amazon.com/cloudformation/home#/stacks/new?stackName=Docker&templateURL=https://editions-us-east-1.s3.amazonaws.com/aws/stable/Docker.tmpl).
+
+The following are appropriate choices for stack parameters:
+
+* Number of Swarm managers = 1
+* Number of Swarm worker nodes = 11
+* Swarm manager instance type? = m4.4xlarge
+* Agent worker instance type? = m4.4xlarge
+
+The rest can be left to the default options.
+
+Once the stack is created, navigate to "Running Instances" on the ec2 service
+page and identify the Docker-Manager machine.
+The Public DNS (IPv4) under the description of that machine gives you the
+address to which you can ssh as the user "docker" with the ssh key you
+used to generate your stack, for example:
+
+```
+$ ssh docker@ec2-99-999-9-99.us-east-2.compute.amazonaws.com
+```
+You should see a "Welcome to Docker!" message.
+Copy all scripts from this swarm directory to your manager machine:
+
+```
+$ scp * docker@ec2-99-999-9-99.us-east-2.compute.amazonaws.com
+```
+
+The deployment scripts need input files listing the nodes on which to run
+the different components of the mini-broker.
+To list the IDs and statuses of the available Docker Swarm nodes, run the
+following command:
+
+```
+$ docker node ls
+```
+
+One of these nodes will be listed as "Leader" under "Management Status."
+The deployment scripts will automatically choose this Leader node for running
+the central Kafka and Zookeeper hub.
+The other 11 nodes will be Swarm worker nodes.
+For this setup of 1+11 Swarm nodes, you can choose five nodes to each house
+the downstream Kafka+Zookeeper+MirrorMaker hubs and corresponding group of
+20 filters, five nodes to each house 20 consumers, and one node containing
+an alert producer generating 10,000 alerts per visit every 39 seconds.
+
+Copy the selected node IDs into the files `filternodes.txt`,
+`consumernodes.txt`, and `sendernodes.txt`, one ID per line.
+The deployment scripts can automatically size a mini-broker depending on the
+number of nodes listed in these files, up to the number of filter classes
+included in the alert_stream image.
+For example, to run only Filter001-Filter040, only list two nodes
+in the `filternodes.txt` and `consumernodes.txt` files.
+The Kafka and Zookeeper Docker images come from the Docker Hub
+organization 'confluentinc' and the MirrorMaker and alert_stream
+Docker images currently come from the organization 'mtpatter', under the repos
+`mirrormaker` and `sims-dev`.
+In order to use the alert_stream image built locally from the Dockerfile included
+here instead of Docker Hub, a private registry must be set up so that
+all nodes of the Swarm are able to access the Docker image.
+See the `deploy_all.sh` and other scripts for details on how the components
+are created.  
+
+Run the main deployment script to bring up the full mini-broker:
+
+```
+$ ./deploy_all.sh
+```
+
+Everything that goes to stdout is written to the Docker service logs.
+For Swarms on Docker for AWS, these logs are accessible via the
+CloudWatch AWS service.
+To view them, navigate to the CloudWatch service homepage, choose
+"Logs" and then choose the name of the CloudFormation stack under "Log Groups."
+You will find one log file per container.
+These can be exported by selecting the stack on the "Logs" page
+and choosing "Export data to Amazon S3" under the "Actions" button.
+The logs can then be downloaded from your S3 bucket.
+
+When finished, you can shut down all services by running the following:
+
+```
+$ docker service rm $(docker service ls -q)
+```
+
+To tear down the stack, navigate to CloudFormation and choose "Delete Stack"
+under "Actions" to clean up.
