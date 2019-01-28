@@ -84,7 +84,7 @@ To start a consumer for printing all alerts in the stream "Filter001" to screen:
 ```
 $ docker run -it --rm \
       --network=alert_stream_default \
-      alert_stream python bin/printStream.py kafka:9092 Filter001
+      alert_stream python bin/printStream.py kafka:9092 Filter001 1
 ```
 
 To start a consumer that will show the status (number of alerts, etc.)
@@ -108,7 +108,7 @@ To collect postage stamp cutouts and output files locally, you can mount a local
 $ docker run -it --rm \
       --network=alert_stream_default \
       -v {local path to write stamps}:/home/alert_stream/stamps:rw \
-      alert_stream python bin/printStream.py kafka:9092 Filter001 --stampDir stamps
+      alert_stream python bin/printStream.py kafka:9092 Filter001 1 --stampDir stamps
 ```
 
 **Shut down and clean up**
