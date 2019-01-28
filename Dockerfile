@@ -9,9 +9,9 @@ RUN pip install avro-python3
 RUN pip install Cython
 RUN pip install fastavro
 
-# Get schemas and template data. # TODO update to checkout master when schema is updated
+# Get schemas and template data.
 WORKDIR /home
-RUN git clone https://github.com/lsst-dm/sample-avro-alert.git && cd sample-avro-alert && git checkout tickets/DM-8160
+RUN git clone https://github.com/lsst-dm/sample-avro-alert.git
 
 # Add code.
 RUN mkdir alert_stream
