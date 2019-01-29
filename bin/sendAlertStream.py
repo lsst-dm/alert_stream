@@ -59,6 +59,8 @@ def main():
 
     # Configure Avro writer schema and data
     schema_files = ["../sample-avro-alert/schema/diasource.avsc",
+                    "../sample-avro-alert/schema/diaforcedsource.avsc",
+                    "../sample-avro-alert/schema/dianondetectionlimit.avsc",
                     "../sample-avro-alert/schema/diaobject.avsc",
                     "../sample-avro-alert/schema/ssobject.avsc",
                     "../sample-avro-alert/schema/cutout.avsc",
