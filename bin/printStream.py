@@ -7,7 +7,6 @@ To run multiple consumers each printing all messages,
 each consumer needs a different group.
 """
 
-from __future__ import print_function
 import argparse
 import sys
 import os
@@ -71,13 +70,6 @@ def main():
     parser.add_argument('--stampDir', type=str,
                         help='Output directory for writing postage stamp'
                         'cutout files. **THERE ARE NO STAMPS RIGHT NOW.**')
-    avrogroup = parser.add_mutually_exclusive_group()
-    avrogroup.add_argument('--decode', dest='avroFlag', action='store_true',
-                           help='Decode from Avro format. (default)')
-    avrogroup.add_argument('--decode-off', dest='avroFlag',
-                           action='store_false',
-                           help='Do not decode from Avro format.')
-    parser.set_defaults(avroFlag=True)
 
     args = parser.parse_args()
 
@@ -89,20 +81,12 @@ def main():
     else:
         conf['group.id'] = os.environ['HOSTNAME']
 
-    # Configure Avro reader schema
-    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
-                    "../sample-avro-alert/schema/diaobject.avsc",
-                    "../sample-avro-alert/schema/ssobject.avsc",
-                    "../sample-avro-alert/schema/cutout.avsc",
-                    "../sample-avro-alert/schema/alert.avsc"]
-
     # Start consumer and print alert stream
-    with alertConsumer.AlertConsumer(args.topic, schema_files,
-                                     **conf) as streamReader:
+    with alertConsumer.AlertConsumer(args.topic, **conf) as streamReader:
         msg_count = 0
         while True:
             try:
-                msg = streamReader.poll(decode=args.avroFlag)
+                msg = streamReader.poll()
 
                 if msg is None:
                     continue
