@@ -9,7 +9,8 @@ import argparse
 import glob
 import time
 import asyncio
-from lsst.alert.stream import alertProducer, avroUtils
+from lsst.alert.stream import alertProducer
+from lsst.alert.packet import retrieve_alerts
 
 
 @asyncio.coroutine
@@ -57,17 +58,9 @@ def main():
                         help='Name of Kafka topic stream to push to.')
     args = parser.parse_args()
 
-    # Configure Avro writer schema and data
-    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
-                    "../sample-avro-alert/schema/diaobject.avsc",
-                    "../sample-avro-alert/schema/ssobject.avsc",
-                    "../sample-avro-alert/schema/cutout.avsc",
-                    "../sample-avro-alert/schema/alert.avsc"]
-
     # Configure producer connection to Kafka broker
     conf = {'bootstrap.servers': args.broker}
-    streamProducer = alertProducer.AlertProducer(
-                        args.topic, schema_files, **conf)
+    streamProducer = alertProducer.AlertProducer(args.topic, **conf)
 
     # Scan for avro files
     root = "./data"
@@ -78,13 +71,14 @@ def main():
         print('visit:', f[15:20], '\ttime:', time.time())
         # Load alert contents
         with open(f, mode='rb') as file_data:
-            data = avroUtils.readSchemaData(file_data)
             # TODO replace Avro files with visits having better S/N cut
             # for now, limit to first 10,000 alerts (current have ~70,000)
+            schema, alert_packets = retrieve_alerts(file_data)
             alert_count = 0
-            for record in data:
+            streamProducer.schema = schema
+            for record in alert_packets:
                 if alert_count < 10000:
-                    streamProducer.send(record, encode=True)
+                    streamProducer.send(record)
                     alert_count += 1
                 else:
                     break
