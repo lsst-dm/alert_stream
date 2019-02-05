@@ -1,13 +1,10 @@
-from __future__ import print_function
-import io
+import struct
 import time
 import confluent_kafka
-from ast import literal_eval
-from . import avroUtils
 
+from lsst.alert.packet import SchemaRegistry
 
 __all__ = ['EopError', 'AlertConsumer']
-
 
 class AlertError(Exception):
     """Base class for exceptions in this module.
@@ -41,17 +38,18 @@ class AlertConsumer(object):
     ----------
     topic : `str`
         Name of the topic to subscribe to.
-    schema_files : Avro schema files
-        The reader Avro schema files for decoding data. Optional.
+    schema : `lsst.alert.packet.Schema`, optional
+        If provided, this schema is always used to decode packets received.
+        Otherwise, an appropriate schema is retrieved from the registry.
     **kwargs
         Keyword arguments for configuring confluent_kafka.Consumer().
     """
 
-    def __init__(self, topic, schema_files=None, **kwargs):
+    def __init__(self, topic, schema=None, **kwargs):
         self.topic = topic
         self.kafka_kwargs = kwargs
-        if schema_files is not None:
-            self.alert_schema = avroUtils.combineSchemas(schema_files)
+        self.schema = schema
+        self.schema_registry = SchemaRegistry.from_filesystem()
 
     def __enter__(self):
         self.consumer = confluent_kafka.Consumer(**self.kafka_kwargs)
@@ -62,7 +60,7 @@ class AlertConsumer(object):
         # FIXME should be properly handling exceptions here, but we aren't
         self.consumer.close()
 
-    def poll(self, decode=False, verbose=True):
+    def poll(self):
         """Polls Kafka broker to consume topic.
 
         Parameters
@@ -78,38 +76,32 @@ class AlertConsumer(object):
             if msg.error():
                 raise EopError(msg)
             else:
-                if verbose is True:
-                    if decode is True:
-                        return self.decodeMessage(msg)
-                    else:
-                        ast_msg = literal_eval(str(msg.value(), encoding='utf-8'))
-                        return ast_msg
+                return self.decode_message(msg)
         return
 
-    def decodeMessage(self, msg):
-        """Decode Avro message according to a schema.
+    def decode_message(self, msg):
+        """Unpack and decode a received message.
 
         Parameters
         ----------
         msg : Kafka message
-            The Kafka message result from consumer.poll().
+            The Kafka message resulting from calling `AlertConsumer.poll`.
 
         Returns
         -------
-        `dict`
+        message : `dict`
             Decoded message.
+
+        Notes
+        -----
+        If this `AlertConsumer` has an associated schema, that will be used
+        for decoding; otherwise, it will attempt to retrieve one from the
+        registry.
         """
-        message = msg.value()
-        try:
-            bytes_io = io.BytesIO(message)
-            #decoded_msg = avroUtils.readSchemaData(bytes_io)
-            decoded_msg = avroUtils.readAvroData(bytes_io, self.alert_schema)
-        except AssertionError:
-            # FIXME this exception is raised but not sure if it matters yet
-            bytes_io = io.BytesIO(message)
-            decoded_msg = None
-        except IndexError:
-            literal_msg = literal_eval(str(message, encoding='utf-8'))  # works to give bytes
-            bytes_io = io.BytesIO(literal_msg)  # works to give <class '_io.BytesIO'>
-            decoded_msg = avroUtils.readSchemaData(bytes_io)  # yields reader
-        return decoded_msg
+        raw_bytes = msg.value()
+        schema_hash = struct.unpack("!I", raw_bytes[1:5])[0]
+        if not self.schema:
+            schema = self.schema_registry.get_by_id(schema_hash)
+        else:
+            schema = self.schema
+        return schema.deserialize(raw_bytes[5:])
