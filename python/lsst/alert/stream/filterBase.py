@@ -43,8 +43,6 @@ class StreamExporter(Exporter):
 
     def __init__(self, producer):
         self.producer = producer
-        self.schema = producer.alert_schema
-        self.topic = producer.topic
 
     def export(self, alert):
-        self.producer.send(alert, encode=True)
+        self.producer.send(alert)
