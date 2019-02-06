@@ -1,5 +1,5 @@
 FROM python:3.6
-LABEL maintainer "maria.t.patterson@gmail.com"
+LABEL maintainer="LSST Alert Production; https://dm.lsst.org/"
 
 # Pip installs.
 RUN pip install 'confluent-kafka>=0.11.4'
