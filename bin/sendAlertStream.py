@@ -75,10 +75,9 @@ def main():
             # for now, limit to first 10,000 alerts (current have ~70,000)
             schema, alert_packets = retrieve_alerts(file_data)
             alert_count = 0
-            streamProducer.schema = schema
             for record in alert_packets:
                 if alert_count < 10000:
-                    streamProducer.send(record)
+                    streamProducer.send(schema, record)
                     alert_count += 1
                 else:
                     break

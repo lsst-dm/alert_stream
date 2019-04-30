@@ -8,14 +8,14 @@ class AlertFilter(object):
         self.outputStream = outputStream
         self.visitId = 'visitId'
 
-    def __call__(self, alert):
+    def __call__(self, schema, alert):
         visit = self.getVisit(alert)
         if visit != self.visitId:
             self.alertCount = 1
             self.visitId = visit
         if self.filter(alert) and self.alertCount <= 20:
             self.alertCount += 1
-            self.outputStream(alert)
+            self.outputStream(schema, alert)
 
     def getVisit(self, alert):
         ccdVisitId = alert['diaSource']['ccdVisitId']
@@ -29,13 +29,10 @@ class AlertFilter(object):
 
 class Exporter(object):
 
-    def __init__(self):
-        self
+    def __call__(self, schema, alert):
+        self.export(schema, alert)
 
-    def __call__(self, alert):
-        self.export(alert)
-
-    def export(self, alert):
+    def export(self, schema, alert):
         raise NotImplementedError
 
 
@@ -44,5 +41,5 @@ class StreamExporter(Exporter):
     def __init__(self, producer):
         self.producer = producer
 
-    def export(self, alert):
-        self.producer.send(alert)
+    def export(self, schema, alert):
+        self.producer.send(schema, alert)

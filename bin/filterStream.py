@@ -48,12 +48,7 @@ def main():
     # Name output stream using filter class name
     topic_name = filter_class.__name__
 
-    # For now, we hard-code filter outputs to be in schema v1.0; ultimately,
-    # we should consider whether we want to preserve the received schema
-    # version.
-    outgoing_schema = SchemaRegistry.from_filesystem().get_by_version("1.0")
-
-    prod = alertProducer.AlertProducer(topic_name, outgoing_schema, **pconf)
+    prod = alertProducer.AlertProducer(topic_name, **pconf)
     exp = filterBase.StreamExporter(prod)
     apply_filter = filter_class(exp)
 
@@ -62,13 +57,13 @@ def main():
 
         while True:
             try:
-                msg = streamReader.poll()
+                schema, msg = streamReader.poll()
 
                 if msg is None:
                     continue
                 else:
                     # Apply filter to each alert
-                        apply_filter(msg)
+                    apply_filter(schema, msg)
 
             except alertConsumer.EopError as e:
                 # Write when reaching end of partition

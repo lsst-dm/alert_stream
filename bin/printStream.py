@@ -86,7 +86,7 @@ def main():
         msg_count = 0
         while True:
             try:
-                msg = streamReader.poll()
+                schema, msg = streamReader.poll()
 
                 if msg is None:
                     continue

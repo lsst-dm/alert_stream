@@ -60,24 +60,32 @@ class AlertConsumer(object):
         # FIXME should be properly handling exceptions here, but we aren't
         self.consumer.close()
 
-    def poll(self):
+    def poll(self, timeout=1e-3):
         """Polls Kafka broker to consume topic.
 
         Parameters
         ----------
-        decode : `boolean`
-            If True, decodes data from Avro format.
-        verbose : `boolean`
-            If True, returns every message. If False, only raises EopError.
+        timeout : `float`
+            Time to wait for a new message before returning.
+
+        Returns
+        -------
+        schema : `lsst.alert.packet.Schema` or `None`
+            Schema used to decode message. `None` if no message was received
+            before the `timeout` was reached.
+        message : `dict` or `None`
+            Decoded message. `None` if no message was received before the
+            `timeout` was reached.
         """
-        msg = self.consumer.poll(timeout=1e-3)
+        msg = self.consumer.poll(timeout)
 
         if msg is not None:
             if msg.error():
                 raise EopError(msg)
             else:
                 return self.decode_message(msg)
-        return
+        else:
+            return None, None
 
     def decode_message(self, msg):
         """Unpack and decode a received message.
@@ -89,6 +97,8 @@ class AlertConsumer(object):
 
         Returns
         -------
+        schema : `schema`
+            Schema used to decode message.
         message : `dict`
             Decoded message.
 
@@ -104,4 +114,4 @@ class AlertConsumer(object):
             schema = self.schema_registry.get_by_id(schema_hash)
         else:
             schema = self.schema
-        return schema.deserialize(raw_bytes[5:])
+        return schema, schema.deserialize(raw_bytes[5:])
