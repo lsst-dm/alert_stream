@@ -10,7 +10,7 @@ RUN pip install numpy
 
 # Get schemas and template data.
 WORKDIR /home
-RUN git clone https://github.com/lsst-dm/sample-avro-alert.git && cd sample-avro-alert && git checkout tickets/DM-17549
+RUN git clone https://github.com/lsst-dm/sample-avro-alert.git
 
 # Add code.
 RUN mkdir alert_stream
