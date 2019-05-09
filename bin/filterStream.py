@@ -11,6 +11,7 @@ import inspect
 from lsst.alert.stream import alertConsumer, alertProducer
 from lsst.alert.stream import filterBase
 from lsst.alert.stream import filters
+from lsst.alert.packet import SchemaRegistry
 
 
 def main():
@@ -27,23 +28,9 @@ def main():
                         'Consumers in the same group will share messages '
                         '(i.e., only one consumer will receive a message, '
                         'as in a queue). Default is value of $HOSTNAME.')
-    avrogroup = parser.add_mutually_exclusive_group()
-    avrogroup.add_argument('--decode', dest='avroFlag', action='store_true',
-                           help='Decode from Avro format. (default)')
-    avrogroup.add_argument('--decode-off', dest='avroFlag',
-                           action='store_false',
-                           help='Do not decode from Avro format.')
-    parser.set_defaults(avroFlag=True)
 
     args = parser.parse_args()
     fnum = args.filterNum
-
-    # Configure Avro reader schema
-    schema_files = ["../sample-avro-alert/schema/diasource.avsc",
-                    "../sample-avro-alert/schema/diaobject.avsc",
-                    "../sample-avro-alert/schema/ssobject.avsc",
-                    "../sample-avro-alert/schema/cutout.avsc",
-                    "../sample-avro-alert/schema/alert.avsc"]
 
     # Configure consumer connection to Kafka broker
     cconf = {'bootstrap.servers': args.broker,
@@ -61,23 +48,22 @@ def main():
     # Name output stream using filter class name
     topic_name = filter_class.__name__
 
-    prod = alertProducer.AlertProducer(topic_name, schema_files, **pconf)
+    prod = alertProducer.AlertProducer(topic_name, **pconf)
     exp = filterBase.StreamExporter(prod)
     apply_filter = filter_class(exp)
 
     # Start consumer and print alert stream
-    with alertConsumer.AlertConsumer(args.topic, schema_files,
-                                     **cconf) as streamReader:
+    with alertConsumer.AlertConsumer(args.topic, **cconf) as streamReader:
 
         while True:
             try:
-                msg = streamReader.poll(decode=True)
+                schema, msg = streamReader.poll()
 
                 if msg is None:
                     continue
                 else:
                     # Apply filter to each alert
-                        apply_filter(msg)
+                    apply_filter(schema, msg)
 
             except alertConsumer.EopError as e:
                 # Write when reaching end of partition

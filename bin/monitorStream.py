@@ -6,7 +6,6 @@ Note that consumers with the same group ID share a stream.
 To run multiple consumers, each consumer needs a different group.
 """
 
-from __future__ import print_function
 import argparse
 import os
 import sys
@@ -39,13 +38,9 @@ def main():
 
         while True:
             try:
-                msg = streamWatcher.poll(decode=False, verbose=False)
-
-                if msg is None:
-                    continue
-                else:
+                schema, msg = streamWatcher.poll()
+                if msg is not None:
                     print(msg)
-
             except alertConsumer.EopError as e:
                 # Write when reaching end of partition
                 sys.stderr.write(e.message)
