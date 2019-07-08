@@ -27,8 +27,8 @@
 from __future__ import print_function
 import argparse
 import sys
-import os
 import inspect
+import platform
 from lsst.alert.stream import alertConsumer, alertProducer
 from lsst.alert.stream import filterBase
 from lsst.alert.stream import filters
@@ -48,18 +48,15 @@ def main():
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
                         '(i.e., only one consumer will receive a message, '
-                        'as in a queue). Default is value of $HOSTNAME.')
+                        'as in a queue). Default is the current hostname.',
+                        default=platform.node())
 
     args = parser.parse_args()
     fnum = args.filterNum
 
     # Configure consumer connection to Kafka broker
-    cconf = {'bootstrap.servers': args.broker,
+    cconf = {'bootstrap.servers': args.broker, 'group.id': args.group,
              'default.topic.config': {'auto.offset.reset': 'smallest'}}
-    if args.group:
-        cconf['group.id'] = args.group
-    else:
-        cconf['group.id'] = os.environ['HOSTNAME']
 
     pconf = {'bootstrap.servers': args.broker}
 

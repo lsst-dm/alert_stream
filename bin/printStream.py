@@ -31,6 +31,8 @@ each consumer needs a different group.
 import argparse
 import sys
 import os
+import platform
+
 from lsst.alert.stream import alertConsumer
 
 
@@ -87,20 +89,17 @@ def main():
                         help='Globally unique name of the consumer group. '
                         'Consumers in the same group will share messages '
                         '(i.e., only one consumer will receive a message, '
-                        'as in a queue). Default is value of $HOSTNAME.')
+                        'as in a queue). Default is the current hostname.',
+                        default=platform.node())
     parser.add_argument('--stampDir', type=str,
-                        help='Output directory for writing postage stamp'
+                        help='Output directory for writing postage stamp '
                         'cutout files. **THERE ARE NO STAMPS RIGHT NOW.**')
 
     args = parser.parse_args()
 
     # Configure consumer connection to Kafka broker
-    conf = {'bootstrap.servers': args.broker,
+    conf = {'bootstrap.servers': args.broker, 'group.id': args.group,
             'default.topic.config': {'auto.offset.reset': 'smallest'}}
-    if args.group:
-        conf['group.id'] = args.group
-    else:
-        conf['group.id'] = os.environ['HOSTNAME']
 
     # Start consumer and print alert stream
     with alertConsumer.AlertConsumer(args.topic, **conf) as streamReader:
