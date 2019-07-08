@@ -16,8 +16,15 @@ services:
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+
+      # Define separate listeners for inside & outside the Docker network.
+      # https://rmoff.net/2018/08/02/kafka-listeners-explained/
+      - KAFKA_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://kafka:29092
+      - KAFKA_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1  # remove for >= 3 brokers
       - KAFKA_DELETE_TOPIC_ENABLE=true
     ports:
-      - "9092"
+      - "29092:29092"
