@@ -24,7 +24,6 @@
 """Alert stream filter deployer.
 """
 
-from __future__ import print_function
 import argparse
 import sys
 import inspect
