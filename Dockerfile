@@ -5,7 +5,7 @@ LABEL maintainer="LSST Alert Production; https://dm.lsst.org/"
 RUN pip install 'confluent-kafka>=0.11.4'
 RUN pip install avro-python3
 RUN pip install Cython
-RUN pip install fastavro==0.21.23
+RUN pip install fastavro
 RUN pip install numpy
 
 # Get schemas and template data.
