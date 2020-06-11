@@ -127,7 +127,3 @@ def main():
             except KeyboardInterrupt:
                 sys.stderr.write('%% Aborted by user\n')
                 sys.exit()
-
-
-if __name__ == "__main__":
-    main()
