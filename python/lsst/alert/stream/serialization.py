@@ -52,7 +52,7 @@ def deserialize_confluent_wire_header(raw):
     return version
 
 
-def serialize_alert(alert, schema=latest_schema):
+def serialize_alert(alert, schema=latest_schema, schema_id=0):
     """Serialize an alert to a byte sequence for sending to Kafka.
 
     Parameters
@@ -62,6 +62,9 @@ def serialize_alert(alert, schema=latest_schema):
     schema : `dict`, optional
         An Avro schema definition describing how to encode `alert`. By default,
         the latest schema is used.
+    schema_id : `int`, optional
+        The Confluent Schema Registry ID of the schema. By default, 0 (an
+        invalid ID) is used, indicating that the schema is not registered.
 
     Returns
     -------
@@ -71,7 +74,7 @@ def serialize_alert(alert, schema=latest_schema):
     """
     buf = io.BytesIO()
     # TODO: Use a proper schema versioning system
-    buf.write(serialize_confluent_wire_header(0))
+    buf.write(serialize_confluent_wire_header(schema_id))
     fastavro.schemaless_writer(buf, schema, alert)
     return buf.getvalue()
 
