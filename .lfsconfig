@@ -1,2 +1,3 @@
 [lfs]
-     url = https://git-lfs.lsst.codes
+	url = https://git-lfs.lsst.cloud/lsst-dm/alert_stream
+	locksverify = false
